@@ -27,7 +27,8 @@ func main() {
 
 	// Create a collector to setup the data searcher
 	collector := colly.NewCollector(
-		colly.AllowedDomains("www.alkosto.com"),
+		colly.AllowedDomains("www.alkosto.com", "alkosto.com"),
+		colly.CacheDir("./alkosto_cache"),
 	)
 	collector.WithTransport(&http.Transport{
 		DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
@@ -49,9 +50,10 @@ func main() {
 		fmt.Println("Response Code: ", r.StatusCode)
 	})
 
-	err = collector.Visit("https://www.alkosto.com")
+	err = collector.Visit(fmt.Sprintf("https://www.alkosto.com/celulares/telefonos-celulares/c/BI_101_ALKOS?page=%d&sort=relevance", 1))
 	if err != nil {
 		log.Fatal("Error Visiting the page ", err)
 	}
+
 	log.Println("Scraping Complete ")
 }
