@@ -4,8 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
-	"net"
-	"net/http"
 	"os"
 	"time"
 
@@ -27,14 +25,10 @@ func main() {
 
 	// Create a collector to setup the data searcher
 	collector := colly.NewCollector(
-		colly.AllowedDomains("www.alkosto.com", "alkosto.com"),
-		colly.CacheDir("./alkosto_cache"),
+		colly.AllowedDomains("www.alkosto.com", "alkosto.com", "exito.com", "www.exito.com"),
+		colly.CacheDir("./cache"),
 	)
-	collector.WithTransport(&http.Transport{
-		DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
-		IdleConnTimeout:       90 * time.Second,
-		ExpectContinueTimeout: 2 * time.Second,
-	})
+	collector.SetRequestTimeout(30 * time.Second)
 
 	// Callbacks
 	collector.OnError(func(r *colly.Response, err error) {
@@ -50,10 +44,14 @@ func main() {
 		fmt.Println("Response Code: ", r.StatusCode)
 	})
 
-	err = collector.Visit(fmt.Sprintf("https://www.alkosto.com/celulares/telefonos-celulares/c/BI_101_ALKOS?page=%d&sort=relevance", 1))
+	collector.OnHTML("script[type='application/ld+json']", func(h *colly.HTMLElement) {
+		fmt.Println(h.Text)
+	})
+
+	err = collector.Visit("https://www.exito.com/televisor-samsung-55-pulgadas-uhd-4k-un55bu8000kxzl-3070371/p")
 	if err != nil {
 		log.Fatal("Error Visiting the page ", err)
 	}
-
+	collector.Wait()
 	log.Println("Scraping Complete ")
 }
