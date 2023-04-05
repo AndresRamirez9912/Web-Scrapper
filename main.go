@@ -28,7 +28,7 @@ func main() {
 		colly.AllowedDomains("www.alkosto.com", "alkosto.com", "exito.com", "www.exito.com"),
 		colly.CacheDir("./cache"),
 	)
-	collector.SetRequestTimeout(30 * time.Second)
+	collector.SetRequestTimeout(120 * time.Second)
 
 	// Callbacks
 	collector.OnError(func(r *colly.Response, err error) {
@@ -45,10 +45,12 @@ func main() {
 	})
 
 	collector.OnHTML("script[type='application/ld+json']", func(h *colly.HTMLElement) {
+		// script[type='application/ld+json']
+		fmt.Println("Entro!!!!")
 		fmt.Println(h.Text)
 	})
 
-	err = collector.Visit("https://www.exito.com/televisor-samsung-55-pulgadas-uhd-4k-un55bu8000kxzl-3070371/p")
+	err = collector.Visit("https://www.exito.com/leche-descremada-sixpack-x-1300-ml-cu-563046/p")
 	if err != nil {
 		log.Fatal("Error Visiting the page ", err)
 	}
