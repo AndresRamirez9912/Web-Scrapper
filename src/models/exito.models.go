@@ -16,7 +16,3 @@ type offers struct {
 	HighPrice int    `json:"highPrice"`
 	Currency  string `json:"priceCurrency"`
 }
-
-type ExitoResponse struct {
-	ProductURL string `json:"product"`
-}

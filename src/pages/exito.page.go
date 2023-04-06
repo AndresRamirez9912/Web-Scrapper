@@ -38,7 +38,7 @@ func ExitoOnHTML(h *colly.HTMLElement) {
 	exitoData = h.Text // Send the response
 }
 
-func HandleResponse() (*models.ExitoProduct, error) {
+func ExitoHandleResponse() (*models.ExitoProduct, error) {
 	exitoProduct := &models.ExitoProduct{}
 	err := json.Unmarshal([]byte(exitoData), exitoProduct)
 	if err != nil {

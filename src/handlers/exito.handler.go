@@ -2,30 +2,23 @@ package handlers
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/models"
 	"webScraper/src/pages"
+	"webScraper/src/utils"
 )
 
 func GetExitoData(w http.ResponseWriter, r *http.Request) {
-	// Get the body
-	body, err := ioutil.ReadAll(r.Body)
+	// Get the URL of the product
+	URL, err := utils.GetProductURL(r)
 	if err != nil {
-		log.Fatal("Error receiving the request ", err)
-	}
-
-	// Convert the data into an object
-	product := &models.ExitoResponse{}
-	err = json.Unmarshal(body, product)
-	if err != nil {
-		log.Fatal("Error Getting the data from the body request ", err)
+		log.Fatal("Error Getting the URL of the Product ", err)
 	}
 
 	// Make the Scraping to the page
-	scrapedProduct, err := sendCollyRequest(product.ProductURL)
+	scrapedProduct, err := sendCollyRequest(URL)
 	if err != nil {
 		log.Fatal("Error Getting the data from the craping ", err)
 	}
@@ -64,7 +57,7 @@ func sendCollyRequest(productURL string) (*models.ExitoProduct, error) {
 
 	collector.Wait()
 
-	exitoData, err := pages.HandleResponse()
+	exitoData, err := pages.ExitoHandleResponse()
 	if err != nil {
 		log.Fatal("Error getting data from scraping")
 		return nil, err
