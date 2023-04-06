@@ -2,9 +2,9 @@ package pages
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"time"
+	"webScraper/src/constants"
 	"webScraper/src/models"
 
 	"github.com/gocolly/colly"
@@ -14,16 +14,16 @@ var exitoData string
 
 func InitExitoCollector() *colly.Collector {
 	collector := colly.NewCollector(
-		colly.AllowedDomains("exito.com", "www.exito.com"),
-		colly.CacheDir("./cache"),
+		colly.AllowedDomains(constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN),
+		colly.CacheDir(constants.CACHE),
 	)
 	collector.SetRequestTimeout(120 * time.Second)
 	return collector
 }
 
 func ExitoOnRequest(r *colly.Request) {
-	r.Headers.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36")
-	fmt.Println("Visiting", r.URL)
+	r.Headers.Set(constants.USER_AGENT, constants.USER_AGENT_LINUX)
+	log.Println("Visiting", r.URL)
 }
 
 func ExitoOnError(r *colly.Response, err error) {
@@ -31,7 +31,7 @@ func ExitoOnError(r *colly.Response, err error) {
 }
 
 func ExitoOnResponse(r *colly.Response) {
-	fmt.Println("Response Code: ", r.StatusCode)
+	log.Println("Response Code: ", r.StatusCode)
 }
 
 func ExitoOnHTML(h *colly.HTMLElement) {

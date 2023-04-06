@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"webScraper/src/constants"
 	"webScraper/src/models"
 	"webScraper/src/pages"
 )
@@ -35,7 +36,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error Serializing the obtained data ", err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
 	w.WriteHeader(http.StatusOK) // Wite status and previous headers into request
 	w.Write(dataResponse)        // Send body
 
@@ -53,7 +54,7 @@ func sendCollyRequest(productURL string) (*models.ExitoProduct, error) {
 
 	collector.OnResponse(pages.ExitoOnResponse)
 
-	collector.OnHTML("script[type='application/ld+json']", pages.ExitoOnHTML)
+	collector.OnHTML(constants.EXITO_QUERY_SELECTOR, pages.ExitoOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
