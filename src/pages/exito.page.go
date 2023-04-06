@@ -10,6 +10,8 @@ import (
 	"github.com/gocolly/colly"
 )
 
+var exitoData string
+
 func InitExitoCollector() *colly.Collector {
 	collector := colly.NewCollector(
 		colly.AllowedDomains("exito.com", "www.exito.com"),
@@ -33,15 +35,15 @@ func ExitoOnResponse(r *colly.Response) {
 }
 
 func ExitoOnHTML(h *colly.HTMLElement) {
-	// fmt.Println(h.Text)
-	handleResponse(h.Text)
+	exitoData = h.Text // Send the response
 }
 
-func handleResponse(data string) {
-	exitoData := &models.ExitoProduct{}
-	err := json.Unmarshal([]byte(data), exitoData)
+func HandleResponse() (*models.ExitoProduct, error) {
+	exitoProduct := &models.ExitoProduct{}
+	err := json.Unmarshal([]byte(exitoData), exitoProduct)
 	if err != nil {
-
+		log.Fatal("Error unmarshaling scraping response ", err)
+		return nil, err
 	}
-	fmt.Printf("%+v\n\n", exitoData)
+	return exitoProduct, nil
 }

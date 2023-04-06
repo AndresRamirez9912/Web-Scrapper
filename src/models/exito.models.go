@@ -12,7 +12,11 @@ type ExitoProduct struct {
 }
 
 type offers struct {
-	LowPrice  string `json:"lowPrice"`
-	HighPrice string `json:"highPrice"`
+	LowPrice  int    `json:"lowPrice"`
+	HighPrice int    `json:"highPrice"`
 	Currency  string `json:"priceCurrency"`
+}
+
+type ExitoResponse struct {
+	ProductURL string `json:"product"`
 }
