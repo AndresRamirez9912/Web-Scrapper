@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"webScraper/src/models"
@@ -35,7 +36,7 @@ func sendColly(productURL string) (*models.ExitoProduct, error) {
 
 	collector.OnResponse(pages.AmazonOnResponse)
 
-	collector.OnHTML("", pages.AmazonOnHTML)
+	collector.OnHTML("div#centerCol.centerColAlign", pages.AmazonOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
@@ -45,11 +46,11 @@ func sendColly(productURL string) (*models.ExitoProduct, error) {
 
 	collector.Wait()
 
-	data, err := pages.AmazonHandleResponse()
-	if err != nil {
-		log.Fatal("Error getting data from scraping")
-		return nil, err
-	}
-
-	return data, nil
+	// data, err := pages.AmazonHandleResponse()
+	// if err != nil {
+	// 	log.Fatal("Error getting data from scraping")
+	// 	return nil, err
+	// }
+	fmt.Println("Finish Scraping")
+	return nil, nil
 }

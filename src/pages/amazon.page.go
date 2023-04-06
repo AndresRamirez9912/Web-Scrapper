@@ -9,6 +9,7 @@ import (
 	"webScraper/src/models"
 
 	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/extensions"
 )
 
 var amazonData string
@@ -19,11 +20,11 @@ func InitAmazonCollector() *colly.Collector {
 		colly.CacheDir(constants.CACHE),
 	)
 	collector.SetRequestTimeout(120 * time.Second)
+	extensions.RandomUserAgent(collector) // Assign a random User Agent
 	return collector
 }
 
 func AmazonOnRequest(r *colly.Request) {
-	r.Headers.Set(constants.USER_AGENT, constants.USER_AGENT_LINUX)
 	log.Println("Visiting", r.URL)
 }
 
@@ -37,7 +38,8 @@ func AmazonOnResponse(r *colly.Response) {
 
 func AmazonOnHTML(h *colly.HTMLElement) {
 	// amazonData = h.Text // Send the response
-	fmt.Println(h.Text)
+	fmt.Println("Entro!!!!!")
+	fmt.Println(h.ChildText("h1"))
 }
 
 func AmazonHandleResponse() (*models.ExitoProduct, error) {

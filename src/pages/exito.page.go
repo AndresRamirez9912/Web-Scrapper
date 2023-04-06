@@ -8,6 +8,7 @@ import (
 	"webScraper/src/models"
 
 	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/extensions"
 )
 
 var exitoData string
@@ -18,11 +19,11 @@ func InitExitoCollector() *colly.Collector {
 		colly.CacheDir(constants.CACHE),
 	)
 	collector.SetRequestTimeout(120 * time.Second)
+	extensions.RandomUserAgent(collector) // Assign a random User Agent
 	return collector
 }
 
 func ExitoOnRequest(r *colly.Request) {
-	r.Headers.Set(constants.USER_AGENT, constants.USER_AGENT_LINUX)
 	log.Println("Visiting", r.URL)
 }
 
