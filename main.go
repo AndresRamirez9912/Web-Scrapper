@@ -2,28 +2,23 @@ package main
 
 import (
 	"log"
-	"webScraper/src/pages"
+	"net/http"
+	"webScraper/src/handlers"
+
+	"github.com/go-chi/chi"
 )
 
 func main() {
+	// Create router
+	router := chi.NewRouter()
 
-	// Create a collector to setup the data searcher
-	collector := pages.InitExitoCollector()
+	// Set handlers
+	router.Get("/exito", handlers.GetExitoData)
 
-	// Callbacks
-	collector.OnError(pages.ExitoOnError)
-
-	collector.OnRequest(pages.ExitoOnRequest)
-
-	collector.OnResponse(pages.ExitoOnResponse)
-
-	collector.OnHTML("script[type='application/ld+json']", pages.ExitoOnHTML)
-
-	// Visit the page
-	err := collector.Visit("https://www.exito.com/leche-descremada-sixpack-x-1300-ml-cu-563046/p")
+	// Start server
+	log.Println("Starting Server at port: 3000")
+	err := http.ListenAndServe(":3000", router)
 	if err != nil {
-		log.Fatal("Error Visiting the page ", err)
+		log.Fatal("Error creating the server: ", err)
 	}
-
-	collector.Wait()
 }
