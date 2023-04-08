@@ -5,8 +5,7 @@ import (
 	"log"
 	"net/http"
 	"webScraper/src/constants"
-	"webScraper/src/models"
-	"webScraper/src/pages"
+	"webScraper/src/scrapers"
 	"webScraper/src/utils"
 )
 
@@ -18,7 +17,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	scrapedProduct, err := sendCollyRequest(URL)
+	scrapedProduct, err := scrapers.SendExitoCollyRequest(URL)
 	if err != nil {
 		log.Fatal("Error Getting the data from the craping ", err)
 	}
@@ -33,35 +32,4 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK) // Wite status and previous headers into request
 	w.Write(dataResponse)        // Send body
 
-}
-
-func sendCollyRequest(productURL string) (*models.ExitoProduct, error) {
-
-	// Create a collector to setup the data searcher
-	collector := pages.InitExitoCollector()
-
-	// Callbacks
-	collector.OnError(pages.ExitoOnError)
-
-	collector.OnRequest(pages.ExitoOnRequest)
-
-	collector.OnResponse(pages.ExitoOnResponse)
-
-	collector.OnHTML(constants.EXITO_QUERY_SELECTOR, pages.ExitoOnHTML)
-
-	// Visit the page
-	err := collector.Visit(productURL)
-	if err != nil {
-		log.Fatal("Error Visiting the page ", err)
-	}
-
-	collector.Wait()
-
-	exitoData, err := pages.ExitoHandleResponse()
-	if err != nil {
-		log.Fatal("Error getting data from scraping")
-		return nil, err
-	}
-
-	return exitoData, nil
 }

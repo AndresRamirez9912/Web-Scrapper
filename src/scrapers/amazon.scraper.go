@@ -1,53 +1,54 @@
-package pages
+package scrapers
 
 import (
+	"fmt"
 	"log"
-	"time"
 	"webScraper/src/constants"
+	"webScraper/src/interfaces"
 	"webScraper/src/models"
 
 	"github.com/gocolly/colly"
-	"github.com/gocolly/colly/extensions"
 )
 
 var amazonData = &models.AmazonProduct{}
 
-func InitAmazonCollector() *colly.Collector {
-	collector := colly.NewCollector(
-		colly.AllowedDomains(constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN),
-		colly.CacheDir(constants.CACHE),
-	)
-	collector.SetRequestTimeout(120 * time.Second)
-	extensions.RandomUserAgent(collector) // Assign a random User Agent
+func SendAmazonCollyRequest(productURL string) (*models.AmazonProduct, error) {
 
-	// Set Proxy
-	// proxySwitcher, err := proxy.RoundRobinProxySwitcher(
-	// 	"socks5://188.226.141.127:1080",
-	// 	"socks5://67.205.132.241:1080",
-	// 	"http://103.155.62.173:8080",
-	// )
+	// Create Object interface
+	scraper := interfaces.Scraper{
+		AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN},
+	}
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// collector.SetProxyFunc(proxySwitcher)
-	return collector
+	// Create Collector
+	collector := scraper.InitCollector()
+
+	// Callbacks
+	collector.OnError(scraper.OnError)
+
+	collector.OnRequest(scraper.OnRequest)
+
+	collector.OnResponse(scraper.OnResponse)
+
+	collector.OnHTML("div#centerCol.centerColAlign, li[data-csa-c-action='image-block-main-image-hover']", amazonOnHTML)
+
+	// Visit the page
+	err := collector.Visit(productURL)
+	if err != nil {
+		log.Fatal("Error Visiting the page ", err)
+	}
+
+	collector.Wait()
+
+	data, err := handleResponse()
+	if err != nil {
+		log.Fatal("Error getting data from scraping")
+		return nil, err
+	}
+	fmt.Println("Finish Scraping")
+	return data, nil
 }
 
-func AmazonOnRequest(r *colly.Request) {
-	log.Println("Visiting", r.URL)
-}
-
-func AmazonOnError(r *colly.Response, err error) {
-	log.Fatal("Error: ", err)
-}
-
-func AmazonOnResponse(r *colly.Response) {
-	log.Println("Response Code: ", r.StatusCode)
-	log.Println("Proxy Usado: ", r.Request.ProxyURL)
-}
-
-func AmazonOnHTML(h *colly.HTMLElement) {
+func amazonOnHTML(h *colly.HTMLElement) {
 	amazonData.Name = h.ChildText("span[id='productTitle']")                                      // Product Tittle
 	amazonData.Brand = h.ChildText("div.celwidget  tbody tr.a-spacing-small.po-brand td.a-span9") // Brand
 
@@ -67,13 +68,13 @@ func AmazonOnHTML(h *colly.HTMLElement) {
 	amazonData.CurrentPrice = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-offscreen")                                 // Product Lower Price
 	amazonData.HighPrice = h.ChildText("div.a-section.a-spacing-small.aok-align-center span.a-offscreen")                                   // Original Price, withou Discount
 
-	// Table Form
+	// Current Form
 	if amazonData.HighPrice == "" {
 		amazonData.HighPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
 		amazonData.CurrentPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
 	}
 
-	// Current Form
+	// Table Form
 	if amazonData.HighPrice == "" {
 		var prices = make(map[int]string)
 		h.ForEach("div.a-section.a-spacing-small table.a-lineitem.a-align-top tr", func(i int, h *colly.HTMLElement) {
@@ -86,6 +87,6 @@ func AmazonOnHTML(h *colly.HTMLElement) {
 
 }
 
-func AmazonHandleResponse() (*models.AmazonProduct, error) {
+func handleResponse() (*models.AmazonProduct, error) {
 	return amazonData, nil
 }
