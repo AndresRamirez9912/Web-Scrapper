@@ -8,7 +8,6 @@ import (
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/extensions"
-	"github.com/gocolly/colly/proxy"
 )
 
 var amazonData = &models.AmazonProduct{}
@@ -22,16 +21,16 @@ func InitAmazonCollector() *colly.Collector {
 	extensions.RandomUserAgent(collector) // Assign a random User Agent
 
 	// Set Proxy
-	proxySwitcher, err := proxy.RoundRobinProxySwitcher(
-		"socks5://188.226.141.127:1080",
-		"socks5://67.205.132.241:1080",
-		"http://103.155.62.173:8080",
-	)
+	// proxySwitcher, err := proxy.RoundRobinProxySwitcher(
+	// 	"socks5://188.226.141.127:1080",
+	// 	"socks5://67.205.132.241:1080",
+	// 	"http://103.155.62.173:8080",
+	// )
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	collector.SetProxyFunc(proxySwitcher)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// collector.SetProxyFunc(proxySwitcher)
 	return collector
 }
 
@@ -65,8 +64,25 @@ func AmazonOnHTML(h *colly.HTMLElement) {
 
 	// Discount Form
 	amazonData.Disccount = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-size-large.a-color-price.savingPriceOverride") // Product Discount
-	amazonData.LowPrice = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-offscreen")                                     // Product Lower Price
+	amazonData.CurrentPrice = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-offscreen")                                 // Product Lower Price
 	amazonData.HighPrice = h.ChildText("div.a-section.a-spacing-small.aok-align-center span.a-offscreen")                                   // Original Price, withou Discount
+
+	// Table Form
+	if amazonData.HighPrice == "" {
+		amazonData.HighPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
+		amazonData.CurrentPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
+	}
+
+	// Current Form
+	if amazonData.HighPrice == "" {
+		var prices = make(map[int]string)
+		h.ForEach("div.a-section.a-spacing-small table.a-lineitem.a-align-top tr", func(i int, h *colly.HTMLElement) {
+			prices[i] = h.ChildText("span.a-price.a-text-price.a-size-base span.a-offscreen ,span.a-price.a-text-price.a-size-medium.apexPriceToPay span.a-offscreen")
+		})
+		amazonData.HighPrice = prices[0]
+		amazonData.CurrentPrice = prices[1]
+		amazonData.Disccount = prices[2]
+	}
 
 }
 
