@@ -1,7 +1,6 @@
 package scrapers
 
 import (
-	"fmt"
 	"log"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
@@ -32,7 +31,7 @@ func SendJumboCollyRequest(productURL string) (*models.JumboProduct, error) {
 
 	collector.OnResponse(scraper.OnResponse)
 
-	collector.OnHTML("div.vtex-store-components-3-x-productImage, div.vtex-flex-layout-0-x-flexCol.ml0.mr0.pl0.pr0.flex.flex-column.h-100.w-100", jumboOnHTML)
+	collector.OnHTML(constants.JUMBO_QUERY_SELECTOR, jumboOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
@@ -52,16 +51,14 @@ func SendJumboCollyRequest(productURL string) (*models.JumboProduct, error) {
 }
 
 func jumboOnHTML(h *colly.HTMLElement) {
-	// Name
 	if jumboData.Name == "" {
-		jumboData.Name = h.ChildText("span.vtex-store-components-3-x-productBrand.vtex-store-components-3-x-productBrand--quickview")
-		jumboData.ImageURL = h.ChildAttr("img.vtex-store-components-3-x-productImageTag.vtex-store-components-3-x-productImageTag--main", "src")
-		jumboData.Description[0] = h.ChildText("div.vtex-store-components-3-x-content.h-auto")
-		jumboData.CurrentPrice = h.ChildText("div#items-price.flex.c-emphasis.tiendasjumboqaio-jumbo-minicart-2-x-cencoPrice div.tiendasjumboqaio-jumbo-minicart-2-x-price")
-		jumboData.HighPrice = h.ChildText("div.b.ml2.tiendasjumboqaio-jumbo-minicart-2-x-cencoListPriceWrapper div.tiendasjumboqaio-jumbo-minicart-2-x-price")
-		jumboData.Disccount = h.ChildText("div.pr7.items-stretch.vtex-flex-layout-0-x-stretchChildrenWidth.flex span.vtex-product-price-1-x-currencyContainer.vtex-product-price-1-x-currencyContainer--summary")
+		jumboData.Name = h.ChildText(constants.JUMBO_QUERY_NAME)
+		jumboData.ImageURL = h.ChildAttr(constants.JUMBO_QUERY_IMAGE_URL, "src")
+		jumboData.Description[0] = h.ChildText(constants.JUMBO_QUERY_DESCRIPTION)
+		jumboData.CurrentPrice = h.ChildText(constants.JUMBO_QUERY_CURRENTPRICE)
+		jumboData.HighPrice = h.ChildText(constants.JUMBO_QUERY_HIGHTPRICE)
+		jumboData.Disccount = h.ChildText(constants.JUMBO_QUERY_DISCOUNT)
 	}
-	fmt.Printf("%+v\n\n", jumboData)
 }
 
 func jumboHandleResponse() (*models.JumboProduct, error) {
