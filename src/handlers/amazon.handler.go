@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"webScraper/src/constants"
@@ -10,7 +11,7 @@ import (
 	"webScraper/src/utils"
 )
 
-func GetExitoData(w http.ResponseWriter, r *http.Request) {
+func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	// Get the URL of the product
 	URL, err := utils.GetProductURL(r)
 	if err != nil {
@@ -18,7 +19,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	scrapedProduct, err := sendCollyRequest(URL)
+	scrapedProduct, err := sendColly(URL)
 	if err != nil {
 		log.Fatal("Error Getting the data from the craping ", err)
 	}
@@ -32,22 +33,21 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
 	w.WriteHeader(http.StatusOK) // Wite status and previous headers into request
 	w.Write(dataResponse)        // Send body
-
 }
 
-func sendCollyRequest(productURL string) (*models.ExitoProduct, error) {
+func sendColly(productURL string) (*models.AmazonProduct, error) {
 
 	// Create a collector to setup the data searcher
-	collector := pages.InitExitoCollector()
+	collector := pages.InitAmazonCollector()
 
 	// Callbacks
-	collector.OnError(pages.ExitoOnError)
+	collector.OnError(pages.AmazonOnError)
 
-	collector.OnRequest(pages.ExitoOnRequest)
+	collector.OnRequest(pages.AmazonOnRequest)
 
-	collector.OnResponse(pages.ExitoOnResponse)
+	collector.OnResponse(pages.AmazonOnResponse)
 
-	collector.OnHTML(constants.EXITO_QUERY_SELECTOR, pages.ExitoOnHTML)
+	collector.OnHTML("div#centerCol.centerColAlign, li[data-csa-c-action='image-block-main-image-hover']", pages.AmazonOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
@@ -57,11 +57,11 @@ func sendCollyRequest(productURL string) (*models.ExitoProduct, error) {
 
 	collector.Wait()
 
-	exitoData, err := pages.ExitoHandleResponse()
+	data, err := pages.AmazonHandleResponse()
 	if err != nil {
 		log.Fatal("Error getting data from scraping")
 		return nil, err
 	}
-
-	return exitoData, nil
+	fmt.Println("Finish Scraping")
+	return data, nil
 }
