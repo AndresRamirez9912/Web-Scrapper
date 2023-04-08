@@ -28,7 +28,7 @@ func SendExitoCollyRequest(productURL string) (*models.ExitoProduct, error) {
 
 	collector.OnResponse(exitoScraper.OnResponse)
 
-	collector.OnHTML(constants.EXITO_QUERY_SELECTOR, onHTML)
+	collector.OnHTML(constants.EXITO_QUERY_SELECTOR, exitoOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
@@ -47,7 +47,7 @@ func SendExitoCollyRequest(productURL string) (*models.ExitoProduct, error) {
 	return exitoData, nil
 }
 
-func onHTML(h *colly.HTMLElement) {
+func exitoOnHTML(h *colly.HTMLElement) {
 	exitoData = h.Text // Send the response
 }
 

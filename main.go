@@ -15,6 +15,7 @@ func main() {
 	// Set handlers
 	router.Get("/exito", handlers.GetExitoData)
 	router.Get("/amazon", handlers.GetAmazonData)
+	router.Get("/jumbo", handlers.GetJumboData)
 
 	// Start server
 	log.Println("Starting Server at port: 3000")

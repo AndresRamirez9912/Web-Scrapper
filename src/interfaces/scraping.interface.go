@@ -28,17 +28,6 @@ func (s Scraper) InitCollector() *colly.Collector {
 	collector.SetRequestTimeout(120 * time.Second)
 	extensions.RandomUserAgent(collector) // Assign a random User Agent
 
-	// Set Proxy
-	// proxySwitcher, err := proxy.RoundRobinProxySwitcher(
-	// 	"socks5://188.226.141.127:1080",
-	// 	"socks5://67.205.132.241:1080",
-	// 	"http://103.155.62.173:8080",
-	// )
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// collector.SetProxyFunc(proxySwitcher)
 	return collector
 }
 
