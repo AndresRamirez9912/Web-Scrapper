@@ -1,8 +1,8 @@
 package scrapers
 
 import (
-	"fmt"
 	"log"
+	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
 	"webScraper/src/models"
@@ -44,7 +44,6 @@ func SendAmazonCollyRequest(productURL string) (*models.AmazonProduct, error) {
 		log.Fatal("Error getting data from scraping")
 		return nil, err
 	}
-	fmt.Println("Finish Scraping")
 	return data, nil
 }
 
@@ -68,10 +67,15 @@ func amazonOnHTML(h *colly.HTMLElement) {
 	amazonData.CurrentPrice = h.ChildText(constants.AMAZON_QUERY_CURRENTPRICE_DISCOUNT) // Product Lower Price
 	amazonData.HighPrice = h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_DISCOUNT)      // Original Price, withou Discount
 
-	// Current Form
+	// Current Form - No discount
 	if amazonData.HighPrice == "" {
 		amazonData.HighPrice = h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_CURRENT)
 		amazonData.CurrentPrice = h.ChildText(constants.AMAZON_QUERY_CURRENTPRICE_CURRENT)
+		prices := strings.Split(h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_CURRENT), "US")
+		if len(prices) > 2 {
+			amazonData.HighPrice = prices[2]
+			amazonData.CurrentPrice = prices[2]
+		}
 	}
 
 	// Table Form
