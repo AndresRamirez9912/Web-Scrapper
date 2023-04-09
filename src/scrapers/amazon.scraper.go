@@ -1,8 +1,8 @@
 package scrapers
 
 import (
-	"fmt"
 	"log"
+	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
 	"webScraper/src/models"
@@ -29,7 +29,7 @@ func SendAmazonCollyRequest(productURL string) (*models.AmazonProduct, error) {
 
 	collector.OnResponse(scraper.OnResponse)
 
-	collector.OnHTML("div#centerCol.centerColAlign, li[data-csa-c-action='image-block-main-image-hover']", amazonOnHTML)
+	collector.OnHTML(constants.AMAZON_QUERY_SELECTOR, amazonOnHTML)
 
 	// Visit the page
 	err := collector.Visit(productURL)
@@ -44,41 +44,45 @@ func SendAmazonCollyRequest(productURL string) (*models.AmazonProduct, error) {
 		log.Fatal("Error getting data from scraping")
 		return nil, err
 	}
-	fmt.Println("Finish Scraping")
 	return data, nil
 }
 
 func amazonOnHTML(h *colly.HTMLElement) {
-	amazonData.Name = h.ChildText("span[id='productTitle']")                                      // Product Tittle
-	amazonData.Brand = h.ChildText("div.celwidget  tbody tr.a-spacing-small.po-brand td.a-span9") // Brand
+	amazonData.Name = h.ChildText(constants.AMAZON_QUERY_NAME)   // Product Tittle
+	amazonData.Brand = h.ChildText(constants.AMAZON_QUERY_BRAND) // Brand
 
 	// Description
 	var description = make(map[int]string)
-	h.ForEach("div[id='feature-bullets'] ul li span.a-list-item", func(i int, h *colly.HTMLElement) {
+	h.ForEach(constants.AMAZON_QUERY_DESCRIPTION, func(i int, h *colly.HTMLElement) {
 		description[i] = h.Text
 	})
 	amazonData.Description = description
 
-	if h.ChildAttr("img.a-dynamic-image", "data-old-hires") != "" {
-		amazonData.ImageURL = h.ChildAttr("img.a-dynamic-image", "data-old-hires") // Image URL
+	if h.ChildAttr(constants.AMAZON_QUERY_IMAGE_URL, constants.AMAZON_QUERY_IMAGE_URL_ATTR) != "" {
+		amazonData.ImageURL = h.ChildAttr(constants.AMAZON_QUERY_IMAGE_URL, constants.AMAZON_QUERY_IMAGE_URL_ATTR) // Image URL
 	}
 
 	// Discount Form
-	amazonData.Disccount = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-size-large.a-color-price.savingPriceOverride") // Product Discount
-	amazonData.CurrentPrice = h.ChildText("div.a-section.a-spacing-none.aok-align-center span.a-offscreen")                                 // Product Lower Price
-	amazonData.HighPrice = h.ChildText("div.a-section.a-spacing-small.aok-align-center span.a-offscreen")                                   // Original Price, withou Discount
+	amazonData.Disccount = h.ChildText(constants.AMAZON_QUERY_DISCOUNT_DISCOUNT)        // Product Discount
+	amazonData.CurrentPrice = h.ChildText(constants.AMAZON_QUERY_CURRENTPRICE_DISCOUNT) // Product Lower Price
+	amazonData.HighPrice = h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_DISCOUNT)      // Original Price, withou Discount
 
-	// Current Form
+	// Current Form - No discount
 	if amazonData.HighPrice == "" {
-		amazonData.HighPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
-		amazonData.CurrentPrice = h.ChildText(".a-section.a-spacing-none.aok-align-center span.a-offscreen")
+		amazonData.HighPrice = h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_CURRENT)
+		amazonData.CurrentPrice = h.ChildText(constants.AMAZON_QUERY_CURRENTPRICE_CURRENT)
+		prices := strings.Split(h.ChildText(constants.AMAZON_QUERY_HIGHTPRICE_CURRENT), "US")
+		if len(prices) > 2 {
+			amazonData.HighPrice = prices[2]
+			amazonData.CurrentPrice = prices[2]
+		}
 	}
 
 	// Table Form
 	if amazonData.HighPrice == "" {
 		var prices = make(map[int]string)
-		h.ForEach("div.a-section.a-spacing-small table.a-lineitem.a-align-top tr", func(i int, h *colly.HTMLElement) {
-			prices[i] = h.ChildText("span.a-price.a-text-price.a-size-base span.a-offscreen ,span.a-price.a-text-price.a-size-medium.apexPriceToPay span.a-offscreen")
+		h.ForEach(constants.AMAZON_QUERY_PRICES_TABLE, func(i int, h *colly.HTMLElement) {
+			prices[i] = h.ChildText(constants.AMAZON_QUERY_PRICE_ELEMENT_TABLE)
 		})
 		amazonData.HighPrice = prices[0]
 		amazonData.CurrentPrice = prices[1]
