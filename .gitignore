@@ -1,2 +1,5 @@
 # Untracked Files
 cache/**
+
+# .env Files
+.env
