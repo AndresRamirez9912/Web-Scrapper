@@ -28,6 +28,7 @@ func main() {
 	router := chi.NewRouter()
 
 	// Set handlers
+	router.Get("/", handlers.Index)
 	router.Get("/exito", handlers.GetExitoData)
 	router.Get("/amazon", handlers.GetAmazonData)
 	router.Get("/jumbo", handlers.GetJumboData)

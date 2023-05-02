@@ -25,6 +25,17 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	// Success Response
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(201)
+
+	// Create Cookie and send
+	cookie := &http.Cookie{
+		Name:     "First Cookie",
+		Value:    "Value Of the cookie",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
+
+	// Redirect to the main page
+	http.RedirectHandler("/", 200)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -49,4 +60,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Response
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(200)
+
+	// Create Cookie and send
+	cookie := &http.Cookie{
+		Name:     "First Cookie",
+		Value:    "Value Of the cookie",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
+
+	// Redirect to the main page
+	http.RedirectHandler("/", 200)
 }
