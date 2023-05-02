@@ -39,3 +39,31 @@ func CreateUser(user *auth.User) error {
 	}
 	return nil
 }
+
+func GetUserByEmail(email string) (string, error) {
+	// Create connection to the DB
+	db, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error creating the user, DB can't connect")
+		return "", err
+	}
+
+	// Execute the SQL sentence
+	sqlSentence := fmt.Sprintf("SELECT password FROM users WHERE email = '%s'", email)
+	response, err := db.Query(sqlSentence)
+	if err != nil {
+		log.Fatal("Error Creating the the user ", err)
+		return "", err
+	}
+
+	// Extract the password of the result
+	var password string
+	for response.Next() {
+		err = response.Scan(&password)
+		if err != nil {
+			log.Println("Error loading the password")
+		}
+	}
+	defer response.Close()
+	return password, nil
+}
