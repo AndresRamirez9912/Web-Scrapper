@@ -5,14 +5,14 @@ import (
 	"log"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
-	"webScraper/src/models"
+	"webScraper/src/models/scraping"
 
 	"github.com/gocolly/colly"
 )
 
 var exitoData string
 
-func SendExitoCollyRequest(productURL string) (*models.ExitoProduct, error) {
+func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
 
 	// Create a collector to setup the data searcher
 	exitoScraper := interfaces.Scraper{
@@ -51,8 +51,8 @@ func exitoOnHTML(h *colly.HTMLElement) {
 	exitoData = h.Text // Send the response
 }
 
-func exitoHandleResponse() (*models.ExitoProduct, error) {
-	exitoProduct := &models.ExitoProduct{}
+func exitoHandleResponse() (*scraping.ExitoProduct, error) {
+	exitoProduct := &scraping.ExitoProduct{}
 	err := json.Unmarshal([]byte(exitoData), exitoProduct)
 	if err != nil {
 		log.Fatal("Error unmarshaling scraping response ", err)

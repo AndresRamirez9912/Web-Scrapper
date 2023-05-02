@@ -24,13 +24,13 @@ func CreateConnectionToDatabase(database string) (*sql.DB, error) {
 	// Open connection
 	db, err := sql.Open("postgres", psqlData)
 	if err != nil {
-		log.Fatal("Error creating the connection to the dataBase, ", err)
+		log.Println("Error creating the connection to the dataBase ", err)
 		return nil, err
 	}
 
 	// Check Connection
 	if err = db.Ping(); err != nil {
-		log.Println("Error trying to connect to the dataBase, ", err)
+		log.Println("Error trying to connect to the dataBase ", err)
 		return nil, err
 	}
 	return db, nil
@@ -42,7 +42,7 @@ func CloseConnection(db *sql.DB) error {
 
 func CreateTables(db *sql.DB) {
 	// Create SQL Database
-	sqlSentence := "CREATE DATABASE webScraping"
+	sqlSentence := "CREATE DATABASE webscraping"
 	_, err := db.Exec(sqlSentence)
 	if err != nil {
 		log.Fatal("Error Creating the DataBase Web Scraping", err)
@@ -57,27 +57,28 @@ func CreateTables(db *sql.DB) {
 	// Open the connection now to the scraping DB
 	dbScraping, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error Creating the connecton to the webscraping DB ", err)
+		log.Println("Error Creating the connection to the webscraping DB ", err)
 	}
 
 	//  Create SQL Tables
 	sqlSentence = `
 	CREATE TABLE users (
-		id UUID PRIMARY KEY,
-		name VARCHAR(20) NOT NULL,
-		email VARCHAR(20) NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
+		id VARCHAR(50) PRIMARY KEY,
+		name VARCHAR(50) NOT NULL,
+		email VARCHAR(50) NOT NULL CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
+		password VARCHAR(100) NOT NULL,
 		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
 
 	// Execute the SQL command
 	_, err = dbScraping.Exec(sqlSentence)
 	if err != nil {
-		log.Fatal("Error Creating the Table Users", err)
+		log.Println("Error Creating the Table Users", err)
 	}
 
-	log.Println("The DataBase and tables were created")
+	log.Println("Successfully creation of the users table")
 
-	// CLose the connection
+	// Close the connection
 	defer CloseConnection(dbScraping)
 }
 
@@ -85,21 +86,21 @@ func ClearDatabase() error {
 	// Open the connection now to the scraping DB
 	db, err := CreateConnectionToDatabase("")
 	if err != nil {
-		log.Fatal("Error Creating the connecton to DB ", err)
+		log.Println("Error Creating the connecton to DB ", err)
 		return err
 	}
 
 	sqlSentence := "DROP DATABASE webScraping"
 	_, err = db.Exec(sqlSentence)
 	if err != nil {
-		log.Fatal("Error Creating the DataBase Web Scraping", err)
+		log.Println("Error Creating the DataBase Web Scraping", err)
 		return err
 	}
 
 	// Close connection
 	CloseConnection(db)
 	if err != nil {
-		log.Fatal("Error Closing the connecton to the webscraping DB ", err)
+		log.Println("Error Closing the connecton to the webscraping DB ", err)
 		return err
 	}
 	return nil
@@ -116,8 +117,9 @@ func ChecWebScrapingExist() bool {
 	// Close connection
 	err = CloseConnection(dbScraping)
 	if err != nil {
-		log.Fatal("Error Closing the connecton to the webscraping DB ", err)
+		log.Println("Error Closing the connecton to the webscraping DB ", err)
 		return false
 	}
+	log.Println("Database webscraping already exists")
 	return true // The DB exists
 }

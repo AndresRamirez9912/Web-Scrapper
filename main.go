@@ -16,7 +16,7 @@ func main() {
 		// Create general Connection
 		DB, err := database.CreateConnectionToDatabase("")
 		if err != nil {
-			log.Fatal("Error creating the connection to the DB", err)
+			log.Println("Error creating the connection to the DB", err)
 		}
 
 		// Create the tables

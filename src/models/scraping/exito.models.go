@@ -1,4 +1,4 @@
-package models
+package scraping
 
 type ExitoProduct struct {
 	Name        string `json:"name"`

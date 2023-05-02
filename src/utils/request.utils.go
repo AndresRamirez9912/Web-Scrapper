@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"webScraper/src/models"
+	models "webScraper/src/models/scraping"
 )
 
 func GetProductURL(r *http.Request) (string, error) {

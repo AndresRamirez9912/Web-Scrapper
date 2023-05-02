@@ -4,16 +4,16 @@ import (
 	"log"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
-	"webScraper/src/models"
+	"webScraper/src/models/scraping"
 
 	"github.com/gocolly/colly"
 )
 
-var jumboData = &models.JumboProduct{
+var jumboData = &scraping.JumboProduct{
 	Description: make(map[int]string),
 }
 
-func SendJumboCollyRequest(productURL string) (*models.JumboProduct, error) {
+func SendJumboCollyRequest(productURL string) (*scraping.JumboProduct, error) {
 	// Clean the objData
 	jumboData.Name = ""
 
@@ -61,6 +61,6 @@ func jumboOnHTML(h *colly.HTMLElement) {
 	}
 }
 
-func jumboHandleResponse() (*models.JumboProduct, error) {
+func jumboHandleResponse() (*scraping.JumboProduct, error) {
 	return jumboData, nil
 }
