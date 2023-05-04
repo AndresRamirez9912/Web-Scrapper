@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"webScraper/src/database"
 	"webScraper/src/handlers"
+	"webScraper/src/middleware"
 
 	"github.com/go-chi/chi"
 )
@@ -24,16 +25,22 @@ func main() {
 	}
 	log.Println("Successfully connection to the database")
 
-	// Create router
+	// Create routers
 	router := chi.NewRouter()
 
-	// Set handlers
+	// Create a group with the session middleware
+	auth := router.Group(nil)
+	auth.Use(middleware.CheckAuth)
+
+	// Handlers without Auth
 	router.Get("/", handlers.Index)
-	router.Get("/exito", handlers.GetExitoData)
-	router.Get("/amazon", handlers.GetAmazonData)
-	router.Get("/jumbo", handlers.GetJumboData)
-	router.Post("/signIn", handlers.SignIn)
+	router.Post("/register", handlers.Register)
 	router.Post("/login", handlers.Login)
+
+	// Handlers with Auth
+	auth.Get("/exito", handlers.GetExitoData)
+	auth.Get("/amazon", handlers.GetAmazonData)
+	auth.Get("/jumbo", handlers.GetJumboData)
 
 	// Start server
 	log.Println("Starting Server at port: 3000")

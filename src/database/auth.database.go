@@ -24,10 +24,10 @@ func CreateUser(user *auth.User) error {
 	}
 
 	// Execute the SQL sentence
-	sqlSentence := fmt.Sprintf("INSERT INTO users (id, name, email, password) VALUES ('%s', '%s', '%s', '%s');", user.Id, user.Name, user.Email, string(hash))
+	sqlSentence := fmt.Sprintf("INSERT INTO users (id, name, email, password, session_cookie) VALUES ('%s', '%s', '%s', '%s', '%s');", user.Id, user.Name, user.Email, string(hash), user.Session_cookie)
 	_, err = db.Exec(sqlSentence)
 	if err != nil {
-		log.Fatal("Error Creating the the user ", err)
+		log.Println("Error Creating the user ", err)
 		return err
 	}
 
@@ -62,8 +62,58 @@ func GetUserByEmail(email string) (string, error) {
 		err = response.Scan(&password)
 		if err != nil {
 			log.Println("Error loading the password")
+			return "", err
 		}
 	}
 	defer response.Close()
 	return password, nil
+}
+
+func GetUserbyCookie(session string) (string, error) {
+	// Create connection to the DB
+	db, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error getting the user, DB can't connect")
+		return "", err
+	}
+
+	// Execute the SQL sentence
+	sqlSentence := fmt.Sprintf("SELECT id FROM users WHERE session_cookie = '%s'", session)
+	response, err := db.Query(sqlSentence)
+	if err != nil {
+		log.Fatal("Cookie not found ", err)
+		return "", err
+	}
+
+	// Extract the id of the result
+	var id string
+	for response.Next() {
+		err = response.Scan(&id)
+		if err != nil {
+			log.Println("Error loading the id")
+			return "", err
+		}
+	}
+	defer response.Close()
+
+	return id, nil
+}
+
+func UpdateCookie(userEmail string, newCookie string) error {
+	// Create connection to the DB
+	db, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error getting the user, DB can't connect")
+		return err
+	}
+
+	// Execute the SQL sentence
+	sqlSentence := fmt.Sprintf("UPDATE users SET session_cookie='%s' WHERE email='%s'", newCookie, userEmail)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Fatal("Error updating cookie ", err)
+		return err
+	}
+
+	return nil
 }

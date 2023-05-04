@@ -67,7 +67,8 @@ func CreateTables(db *sql.DB) {
 		name VARCHAR(50) NOT NULL,
 		email VARCHAR(50) NOT NULL UNIQUE CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
 		password VARCHAR(100) NOT NULL,
-		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		session_cookie VARCHAR(50) NOT NULL UNIQUE
 	)`
 
 	// Execute the SQL command
