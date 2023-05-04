@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"webScraper/src/models"
+	"webScraper/src/models/auth"
+	models "webScraper/src/models/scraping"
 )
 
 func GetProductURL(r *http.Request) (string, error) {
@@ -24,4 +25,19 @@ func GetProductURL(r *http.Request) (string, error) {
 		return "", err
 	}
 	return product.ProductURL, nil
+}
+
+func GetBody(r *http.Request) (*auth.User, error) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println("Error reading the body request")
+		return nil, err
+	}
+	user := &auth.User{}
+	err = json.Unmarshal(body, user)
+	if err != nil {
+		log.Println("Error unmarshalling the body request")
+		return nil, err
+	}
+	return user, nil
 }

@@ -5,14 +5,14 @@ import (
 	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
-	"webScraper/src/models"
+	"webScraper/src/models/scraping"
 
 	"github.com/gocolly/colly"
 )
 
-var amazonData = &models.AmazonProduct{}
+var amazonData = &scraping.AmazonProduct{}
 
-func SendAmazonCollyRequest(productURL string) (*models.AmazonProduct, error) {
+func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) {
 
 	// Create Object interface
 	scraper := interfaces.Scraper{
@@ -91,6 +91,6 @@ func amazonOnHTML(h *colly.HTMLElement) {
 
 }
 
-func handleResponse() (*models.AmazonProduct, error) {
+func handleResponse() (*scraping.AmazonProduct, error) {
 	return amazonData, nil
 }

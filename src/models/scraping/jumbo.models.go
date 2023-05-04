@@ -1,4 +1,4 @@
-package models
+package scraping
 
 type JumboProduct struct {
 	Name         string
