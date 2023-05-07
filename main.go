@@ -21,7 +21,11 @@ func main() {
 		}
 
 		// Create the tables
-		database.CreateTables(DB)
+		err = database.CreateTables(DB)
+		if err != nil {
+			log.Fatal("Error creating the database")
+			return
+		}
 	}
 	log.Println("Successfully connection to the database")
 
