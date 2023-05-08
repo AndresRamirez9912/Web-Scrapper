@@ -170,8 +170,8 @@ func createProductTable(connection *sql.DB) error {
 		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		brand VARCHAR(50) NOT NULL,
 		description VARCHAR NOT NULL,
-		imageURL VARCHAR(120) NOT NULL,
-		productURL VARCHAR(120) NOT NULL
+		imageURL VARCHAR(500) NOT NULL,
+		productURL VARCHAR(500) NOT NULL
 	)`
 
 	// Execute the SQL command
@@ -230,7 +230,7 @@ func createPriceHistoryTable(connection *sql.DB) error {
 	CREATE TABLE price_history (
 		price_history_id VARCHAR(50) PRIMARY KEY,
 		product_id VARCHAR(50) NOT NULL,
-		date_changed VARCHAR(50) NOT NULL,
+		date_changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		current_price VARCHAR(50) NOT NULL,
 		discount VARCHAR(50) NOT NULL,
 		high_price VARCHAR(50) NOT NULL

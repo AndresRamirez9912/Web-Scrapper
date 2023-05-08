@@ -18,12 +18,15 @@ func (A *AmazonProduct) CreateProductStructure(userId string) *Product {
 		description = v + description
 	}
 	return &Product{
-		Product_id:      "hello",
+		Product_id:      A.Id,
 		User_product_id: userId + A.Id,
 		Name:            A.Name,
 		Brand:           A.Brand,
 		Description:     description,
 		ImageURL:        A.ImageURL,
 		ProductURL:      A.ProductURL,
+		Current_price:   A.CurrentPrice,
+		Discount:        A.Disccount,
+		High_price:      A.HighPrice,
 	}
 }

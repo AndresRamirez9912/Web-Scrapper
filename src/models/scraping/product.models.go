@@ -8,4 +8,7 @@ type Product struct {
 	Description     string
 	ImageURL        string
 	ProductURL      string
+	Current_price   string
+	Discount        string
+	High_price      string
 }

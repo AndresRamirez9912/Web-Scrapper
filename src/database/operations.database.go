@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"webScraper/src/models/scraping"
+
+	"github.com/google/uuid"
 )
 
 func CreateProduct(product scraping.Product, userId string) error {
@@ -28,8 +30,14 @@ func CreateProduct(product scraping.Product, userId string) error {
 		return err
 	}
 
-	// Create relation to the user inserting a field in the user_product table
+	// Create the user_product in the DB Product
 	err = createUserProductField(connection, product, userId)
+	if err != nil {
+		return err
+	}
+
+	// Create the price in the DB Product
+	err = createPriceField(connection, product)
 	if err != nil {
 		return err
 	}
@@ -79,7 +87,7 @@ func createProductField(connection *sql.DB, product scraping.Product) error {
 	// Execute the SQL command
 	_, err := connection.Exec(sqlSentence)
 	if err != nil {
-		log.Println("Error Creating the user Table", err)
+		log.Println("Error Creating the product field", err)
 		return err
 	}
 
@@ -96,10 +104,50 @@ func createUserProductField(connection *sql.DB, product scraping.Product, userId
 	// Execute the SQL command
 	_, err := connection.Exec(sqlSentence)
 	if err != nil {
-		log.Println("Error Creating the user Table", err)
+		log.Println("Error Creating the user_product field", err)
 		return err
 	}
 
-	log.Println("User Created Successfully")
+	log.Println("UserProduct Created Successfully")
+	return nil
+}
+
+func createPriceField(connection *sql.DB, product scraping.Product) error {
+	sentence := `INSERT INTO price (price_id, product_id, 
+		current_price, discount, high_price) 
+		VALUES ('%s', '%s', '%s', '%s', '%s')`
+
+	sqlSentence := fmt.Sprintf(sentence, uuid.New().String(),
+		product.Product_id, product.Current_price, product.Discount,
+		product.High_price)
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the price field", err)
+		return err
+	}
+
+	log.Println("Price Created Successfully")
+	return nil
+}
+
+func createPriceHistoryField(connection *sql.DB, product scraping.Product) error {
+	sentence := `INSERT INTO price_history (price_history_id, product_id, 
+		current_price, discount, high_price) 
+		VALUES ('%s', '%s', '%s', '%s', '%s')`
+
+	sqlSentence := fmt.Sprintf(sentence, uuid.New().String(),
+		product.Product_id, product.Current_price, product.Discount,
+		product.High_price)
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the Price History field", err)
+		return err
+	}
+
+	log.Println("Price History Created Successfully")
 	return nil
 }
