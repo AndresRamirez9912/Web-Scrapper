@@ -24,7 +24,7 @@ func CreateUser(user *auth.User) error {
 	}
 
 	// Execute the SQL sentence
-	sqlSentence := fmt.Sprintf("INSERT INTO users (id, name, email, password, session_cookie) VALUES ('%s', '%s', '%s', '%s', '%s');", user.Id, user.Name, user.Email, string(hash), user.Session_cookie)
+	sqlSentence := fmt.Sprintf("INSERT INTO users (user_id, name, email, password, session_cookie) VALUES ('%s', '%s', '%s', '%s', '%s');", user.Id, user.Name, user.Email, string(hash), user.Session_cookie)
 	_, err = db.Exec(sqlSentence)
 	if err != nil {
 		log.Println("Error Creating the user ", err)
@@ -78,7 +78,7 @@ func GetUserbyCookie(session string) (string, error) {
 	}
 
 	// Execute the SQL sentence
-	sqlSentence := fmt.Sprintf("SELECT id FROM users WHERE session_cookie = '%s'", session)
+	sqlSentence := fmt.Sprintf("SELECT user_id FROM users WHERE session_cookie = '%s'", session)
 	response, err := db.Query(sqlSentence)
 	if err != nil {
 		log.Fatal("Cookie not found ", err)

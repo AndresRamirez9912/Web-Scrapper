@@ -1,6 +1,7 @@
 package scraping
 
 type AmazonProduct struct {
+	Id           string
 	Name         string
 	CurrentPrice string
 	Disccount    string
@@ -8,4 +9,21 @@ type AmazonProduct struct {
 	Brand        string
 	Description  map[int]string
 	ImageURL     string
+	ProductURL   string
+}
+
+func (A *AmazonProduct) CreateProductStructure(userId string) *Product {
+	description := "&"
+	for _, v := range A.Description {
+		description = v + description
+	}
+	return &Product{
+		Product_id:      "hello",
+		User_product_id: userId + A.Id,
+		Name:            A.Name,
+		Brand:           A.Brand,
+		Description:     description,
+		ImageURL:        A.ImageURL,
+		ProductURL:      A.ProductURL,
+	}
 }

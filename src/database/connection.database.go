@@ -166,12 +166,12 @@ func createProductTable(connection *sql.DB) error {
 	sqlSentence := `
 	CREATE TABLE product (
 		product_id VARCHAR(50) PRIMARY KEY,
-		user_product_id VARCHAR(50) NOT NULL,
-		name VARCHAR(50) NOT NULL,		
+		name VARCHAR(100) NOT NULL,		
 		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		brand VARCHAR(50) NOT NULL,
-		description VARCHAR(150) NOT NULL,
-		imageURL VARCHAR(50) NOT NULL
+		description VARCHAR NOT NULL,
+		imageURL VARCHAR(120) NOT NULL,
+		productURL VARCHAR(120) NOT NULL
 	)`
 
 	// Execute the SQL command
@@ -253,9 +253,6 @@ func addForeignKeys(connection *sql.DB) error {
 	ALTER TABLE user_product 
 	ADD FOREIGN KEY (product_id) REFERENCES product(product_id),
 	ADD FOREIGN KEY (user_id) REFERENCES users(user_id);
-	
-	ALTER TABLE product 
-	ADD FOREIGN KEY (user_product_id) REFERENCES user_product(user_product_id);
 
 	ALTER TABLE price 
 	ADD FOREIGN KEY (product_id) REFERENCES product(product_id);
