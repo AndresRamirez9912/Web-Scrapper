@@ -12,6 +12,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
+var exitoProduct = &scraping.ExitoProduct{}
 var exitoData string
 
 func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
@@ -58,11 +59,13 @@ func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
 }
 
 func exitoOnHTML(h *colly.HTMLElement) {
-	exitoData = h.Text // Send the response
+	if exitoData == "" {
+		exitoData = h.ChildText("script[type='application/ld+json']") // Send the response
+	}
+	exitoProduct.Id = h.ChildText("span.vtex-product-identifier-0-x-product-identifier__value")
 }
 
 func exitoHandleResponse() (*scraping.ExitoProduct, error) {
-	exitoProduct := &scraping.ExitoProduct{}
 	err := json.Unmarshal([]byte(exitoData), exitoProduct)
 	if err != nil {
 		log.Fatal("Error unmarshaling scraping response ", err)

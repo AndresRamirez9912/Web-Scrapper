@@ -13,7 +13,7 @@ const JUMBO_DOMAIN = "www.tiendasjumbo.co"
 const JUMBO_HALF_DOMAIN = "tiendasjumbo.co"
 
 // Query Selectors
-const EXITO_QUERY_SELECTOR = "script[type='application/ld+json']"
+const EXITO_QUERY_SELECTOR = "div.flex.flex-grow-1.w-100.flex-column, div.flex.flex-column.min-vh-100.w-100"
 
 // Amazon
 const AMAZON_QUERY_SELECTOR = "div#centerCol.centerColAlign, li[data-csa-c-action='image-block-main-image-hover']"
