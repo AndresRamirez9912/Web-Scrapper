@@ -40,7 +40,7 @@ func CloseConnection(db *sql.DB) error {
 	return db.Close()
 }
 
-func CreateTables(db *sql.DB) {
+func CreateTables(db *sql.DB) error {
 	// Create SQL Database
 	sqlSentence := "CREATE DATABASE webscraping"
 	_, err := db.Exec(sqlSentence)
@@ -52,35 +52,50 @@ func CreateTables(db *sql.DB) {
 	err = CloseConnection(db)
 	if err != nil {
 		log.Fatal("Error Closing the connection to the general DB")
+		return err
 	}
 
 	// Open the connection now to the scraping DB
 	dbScraping, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
 		log.Println("Error Creating the connection to the webscraping DB ", err)
+		return err
 	}
 
-	//  Create SQL Tables
-	sqlSentence = `
-	CREATE TABLE users (
-		id VARCHAR(50) PRIMARY KEY,
-		name VARCHAR(50) NOT NULL,
-		email VARCHAR(50) NOT NULL UNIQUE CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
-		password VARCHAR(100) NOT NULL,
-		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		session_cookie VARCHAR(50) NOT NULL UNIQUE
-	)`
-
-	// Execute the SQL command
-	_, err = dbScraping.Exec(sqlSentence)
+	// Createthe tables
+	err = createUserTable(dbScraping)
 	if err != nil {
-		log.Println("Error Creating the Table Users", err)
+		return err
 	}
 
-	log.Println("Successfully creation of the users table")
+	err = createUserProductTable(dbScraping)
+	if err != nil {
+		return err
+	}
+
+	err = createProductTable(dbScraping)
+	if err != nil {
+		return err
+	}
+
+	err = createPriceHistoryTable(dbScraping)
+	if err != nil {
+		return err
+	}
+
+	err = createPriceTable(dbScraping)
+	if err != nil {
+		return err
+	}
+
+	err = addForeignKeys(dbScraping)
+	if err != nil {
+		return err
+	}
 
 	// Close the connection
 	defer CloseConnection(dbScraping)
+	return nil
 }
 
 func ClearDatabase() error {
@@ -123,4 +138,135 @@ func ChecWebScrapingExist() bool {
 	}
 	log.Println("Database webscraping already exists")
 	return true // The DB exists
+}
+
+func createUserTable(connection *sql.DB) error {
+	sqlSentence := `
+	CREATE TABLE users (
+		user_id VARCHAR(50) PRIMARY KEY,
+		name VARCHAR(50) NOT NULL,
+		email VARCHAR(50) NOT NULL UNIQUE CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
+		password VARCHAR(100) NOT NULL,
+		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		session_cookie VARCHAR(50) NOT NULL UNIQUE
+	)`
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the user Table", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the user table")
+	return nil
+}
+
+func createProductTable(connection *sql.DB) error {
+	sqlSentence := `
+	CREATE TABLE product (
+		product_id VARCHAR(50) PRIMARY KEY,
+		name VARCHAR(100) NOT NULL,		
+		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		brand VARCHAR(50) NOT NULL,
+		description VARCHAR NOT NULL,
+		imageURL VARCHAR(500) NOT NULL,
+		productURL VARCHAR(500) NOT NULL
+	)`
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the Product Table", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the Product table")
+	return nil
+}
+
+func createUserProductTable(connection *sql.DB) error {
+	sqlSentence := `
+	CREATE TABLE user_product (
+		user_product_id VARCHAR(50) PRIMARY KEY,
+		user_id VARCHAR(50) NOT NULL,
+		product_id VARCHAR(50) NOT NULL
+	)`
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the User_Product Table", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the User_Product table")
+	return nil
+}
+
+func createPriceTable(connection *sql.DB) error {
+	sqlSentence := `
+	CREATE TABLE price (
+		price_id VARCHAR(50) PRIMARY KEY,
+		product_id VARCHAR(50) NOT NULL,
+		current_price VARCHAR(50) NOT NULL,
+		discount VARCHAR(50) NOT NULL,
+		high_price VARCHAR(50) NOT NULL
+	)`
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the Price Table", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the Price table")
+	return nil
+}
+
+func createPriceHistoryTable(connection *sql.DB) error {
+	sqlSentence := `
+	CREATE TABLE price_history (
+		price_history_id VARCHAR(50) PRIMARY KEY,
+		product_id VARCHAR(50) NOT NULL,
+		date_changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		current_price VARCHAR(50) NOT NULL,
+		discount VARCHAR(50) NOT NULL,
+		high_price VARCHAR(50) NOT NULL
+	)`
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the Price History Table", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the Price History Table")
+	return nil
+}
+
+func addForeignKeys(connection *sql.DB) error {
+	// Add FK of the user_product Table
+	sqlSentence := `
+	ALTER TABLE user_product 
+	ADD FOREIGN KEY (product_id) REFERENCES product(product_id),
+	ADD FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+	ALTER TABLE price 
+	ADD FOREIGN KEY (product_id) REFERENCES product(product_id);
+
+	ALTER TABLE price_history 
+	ADD FOREIGN KEY (product_id) REFERENCES product(product_id);
+	`
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Creating the Foreign Keys", err)
+		return err
+	}
+
+	log.Println("Successfully creation of the Foreign Keys")
+	return nil
 }

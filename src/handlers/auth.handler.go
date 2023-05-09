@@ -44,7 +44,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 
 	// Success Response
-	w.Header().Add("content-type", "application/json")
+	w.Header().Add(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
 
 	// Redirect to the main page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -94,7 +94,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// Response to the client
 	http.SetCookie(w, cookie)
-	w.Header().Add("content-type", "application/json")
+	w.Header().Add(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
 
 	// Redirect to the main page
 	http.Redirect(w, r, "/", http.StatusSeeOther)

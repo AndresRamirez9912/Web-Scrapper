@@ -5,11 +5,15 @@ import (
 	"log"
 	"net/http"
 	"webScraper/src/constants"
+	"webScraper/src/interfaces"
 	"webScraper/src/scrapers"
 	"webScraper/src/utils"
 )
 
 func GetExitoData(w http.ResponseWriter, r *http.Request) {
+	// Get the User Id from the Cookie
+	userId := r.Context().Value(constants.USER_ID).(string)
+
 	// Get the URL of the product
 	URL, err := utils.GetProductURL(r)
 	if err != nil {
@@ -26,6 +30,12 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	dataResponse, err := json.Marshal(scrapedProduct)
 	if err != nil {
 		log.Fatal("Error Serializing the obtained data ", err)
+	}
+
+	// Create the product and store in DB
+	err = interfaces.CreateProduct(scrapedProduct, userId)
+	if err != nil {
+		log.Println("Error creating the Amazon product")
 	}
 
 	w.Header().Set(constants.CONTENT_TYPE, constants.APPLICATION_JSON)

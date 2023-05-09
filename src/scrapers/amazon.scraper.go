@@ -1,6 +1,7 @@
 package scrapers
 
 import (
+	"errors"
 	"log"
 	"strings"
 	"webScraper/src/constants"
@@ -44,6 +45,16 @@ func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) 
 		log.Fatal("Error getting data from scraping")
 		return nil, err
 	}
+
+	// Get the Product Id from the URL
+	productId, err := getProductId(productURL)
+	if err != nil {
+		log.Fatal("Error getting the Id of the product")
+		return nil, err
+	}
+
+	data.Id = productId
+	data.ProductURL = productURL
 	return data, nil
 }
 
@@ -93,4 +104,15 @@ func amazonOnHTML(h *colly.HTMLElement) {
 
 func handleResponse() (*scraping.AmazonProduct, error) {
 	return amazonData, nil
+}
+
+func getProductId(productURL string) (string, error) {
+	productWithoutQuery := strings.Replace(productURL, "?", "/", -1)
+	urlElements := strings.Split(productWithoutQuery, "/")
+	for index, value := range urlElements {
+		if value == "dp" {
+			return urlElements[index+1], nil
+		}
+	}
+	return "", errors.New("Product Id not found")
 }

@@ -1,7 +1,12 @@
 package handlers
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+	"webScraper/src/constants"
+)
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Bienvenido al web scraping"))
+	userId := r.Context().Value(constants.SESSION_TOKEN)
+	w.Write([]byte(fmt.Sprintf("Bienvenido al web scraping usuario %s", userId)))
 }
