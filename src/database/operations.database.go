@@ -31,6 +31,17 @@ func TrackProduct(product scraping.Product, userId string) error {
 
 		// If the price has chaged, update the current price and store in historical
 		if priceChange {
+			// Update Current Price
+			err = updatePrice(connection, product)
+			if err != nil {
+				return err
+			}
+
+			// Store in Price History DB
+			err = createPriceHistoryField(connection, product)
+			if err != nil {
+				return err
+			}
 
 		}
 		return nil
@@ -54,6 +65,12 @@ func TrackProduct(product scraping.Product, userId string) error {
 		return err
 	}
 
+	// Create the Price History field in the DB
+	err = createPriceHistoryField(connection, product)
+	if err != nil {
+		return err
+	}
+
 	// Close the connection
 	defer CloseConnection(connection)
 
@@ -62,22 +79,22 @@ func TrackProduct(product scraping.Product, userId string) error {
 
 func checkIfProductExists(connection *sql.DB, product_id string) error {
 	// Execute the SQL sentence
-	sqlSentence := fmt.Sprintf("SELECT name FROM product WHERE product_id = '%s'", product_id)
+	sqlSentence := fmt.Sprintf("SELECT product_id FROM product WHERE product_id = '%s'", product_id)
 	response, err := connection.Query(sqlSentence)
 	if err != nil {
 		return err
 	}
 
 	// Extract the name of the product if it exits
-	var name string
+	var product string
 	for response.Next() {
-		err = response.Scan(&name)
+		err = response.Scan(&product)
 		if err != nil {
 			return err
 		}
 	}
 
-	if name == "" {
+	if product == "" {
 		defer response.Close()
 		return errors.New("The product doesn't exists")
 	}
@@ -191,4 +208,20 @@ func checkPriceChanges(connection *sql.DB, product scraping.Product) (bool, erro
 	log.Println("The price has changed")
 	defer response.Close()
 	return true, nil
+}
+
+func updatePrice(connection *sql.DB, product scraping.Product) error {
+	sentence := `UPDATE price SET current_price='%s', discount='%s', high_price='%s' WHERE product_id='%s'`
+
+	sqlSentence := fmt.Sprintf(sentence, product.Current_price, product.Discount, product.High_price, product.Product_id)
+
+	// Execute the SQL command
+	_, err := connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error Updating the Price field", err)
+		return err
+	}
+
+	log.Println("Price Updated Successfully")
+	return nil
 }

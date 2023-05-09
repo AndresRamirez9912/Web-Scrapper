@@ -2,7 +2,6 @@ package scrapers
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"strings"
 	"webScraper/src/constants"
@@ -110,7 +109,6 @@ func handleResponse() (*scraping.AmazonProduct, error) {
 func getProductId(productURL string) (string, error) {
 	productWithoutQuery := strings.Replace(productURL, "?", "/", -1)
 	urlElements := strings.Split(productWithoutQuery, "/")
-	fmt.Println(urlElements)
 	for index, value := range urlElements {
 		if value == "dp" {
 			return urlElements[index+1], nil
