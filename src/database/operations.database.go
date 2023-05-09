@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateProduct(product scraping.Product, userId string) error {
+func TrackProduct(product scraping.Product, userId string) error {
 	// Open the connection now to the scraping DB
 	connection, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
@@ -19,9 +19,21 @@ func CreateProduct(product scraping.Product, userId string) error {
 	}
 
 	// Check if the product already exists
-	exists := checkProduct(connection, product.Product_id)
+	exists := checkIfProductExists(connection, product.Product_id)
 	if exists == nil {
-		return errors.New("The product already exists")
+		log.Println("The product already exists")
+
+		// Check if the price change
+		priceChange, err := checkPriceChanges(connection, product)
+		if err != nil {
+			return errors.New("Error checking the price")
+		}
+
+		// If the price has chaged, update the current price and store in historical
+		if priceChange {
+
+		}
+		return nil
 	}
 
 	// Create the product in the DB Product
@@ -48,7 +60,7 @@ func CreateProduct(product scraping.Product, userId string) error {
 	return nil
 }
 
-func checkProduct(connection *sql.DB, product_id string) error {
+func checkIfProductExists(connection *sql.DB, product_id string) error {
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("SELECT name FROM product WHERE product_id = '%s'", product_id)
 	response, err := connection.Query(sqlSentence)
@@ -71,7 +83,6 @@ func checkProduct(connection *sql.DB, product_id string) error {
 	}
 
 	defer response.Close()
-	log.Println("The product already exists")
 	return nil
 }
 
@@ -150,4 +161,34 @@ func createPriceHistoryField(connection *sql.DB, product scraping.Product) error
 
 	log.Println("Price History Created Successfully")
 	return nil
+}
+
+func checkPriceChanges(connection *sql.DB, product scraping.Product) (bool, error) {
+	// Get the Price from the DB
+	sqlSentence := fmt.Sprintf("SELECT * FROM price WHERE product_id = '%s'", product.Product_id)
+	response, err := connection.Query(sqlSentence)
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return false, err
+	}
+
+	// Extract the name of the product if it exits
+	var price_field [5]string
+	for response.Next() {
+		err = response.Scan(&price_field[0], &price_field[1], &price_field[2], &price_field[3], &price_field[4])
+		if err != nil {
+			log.Println("Error getting the stored prices", err)
+			return false, err
+		}
+	}
+
+	// Check if the current price is equal to the previously price
+	if price_field[2] == product.Current_price {
+		log.Println("The price is equal")
+		return false, nil
+	}
+
+	log.Println("The price has changed")
+	defer response.Close()
+	return true, nil
 }

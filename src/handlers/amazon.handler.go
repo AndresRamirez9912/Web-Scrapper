@@ -34,7 +34,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 
 	// Create the product in the DB
 	product := scrapedProduct.CreateProductStructure(userId)
-	err = database.CreateProduct(*product, userId)
+	err = database.TrackProduct(*product, userId)
 	if err != nil {
 		log.Println("Error creating the Amazon product")
 	}
