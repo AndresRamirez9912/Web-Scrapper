@@ -2,7 +2,9 @@ package scrapers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
+	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
 	"webScraper/src/models/scraping"
@@ -44,6 +46,14 @@ func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
 		return nil, err
 	}
 
+	// Get the additional information
+	productId, err := getExitoProductId(productURL)
+	if err != nil {
+		return nil, err
+	}
+
+	exitoData.Id = productId
+
 	return exitoData, nil
 }
 
@@ -59,4 +69,13 @@ func exitoHandleResponse() (*scraping.ExitoProduct, error) {
 		return nil, err
 	}
 	return exitoProduct, nil
+}
+
+func getExitoProductId(productURL string) (string, error) {
+	elementsURL := strings.Split(productURL, "-")
+	productId := strings.Replace(elementsURL[len(elementsURL)-1], "/p", "", -1)
+	if productId == "" {
+		return "", errors.New("Product Id not found")
+	}
+	return productId, nil
 }

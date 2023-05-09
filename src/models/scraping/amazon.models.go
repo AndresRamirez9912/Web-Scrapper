@@ -12,12 +12,12 @@ type AmazonProduct struct {
 	ProductURL   string
 }
 
-func (A *AmazonProduct) CreateProductStructure(userId string) *Product {
+func (A *AmazonProduct) CreateProductStructure(userId string) Product {
 	description := "&"
 	for _, v := range A.Description {
 		description = v + description
 	}
-	return &Product{
+	return Product{
 		Product_id:      A.Id,
 		User_product_id: userId + A.Id,
 		Name:            A.Name,

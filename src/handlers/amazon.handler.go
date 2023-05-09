@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"webScraper/src/constants"
-	"webScraper/src/database"
+	"webScraper/src/interfaces"
 	"webScraper/src/scrapers"
 	"webScraper/src/utils"
 )
@@ -33,8 +33,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the product in the DB
-	product := scrapedProduct.CreateProductStructure(userId)
-	err = database.TrackProduct(*product, userId)
+	err = interfaces.CreateProduct(scrapedProduct, userId)
 	if err != nil {
 		log.Println("Error creating the Amazon product")
 	}
