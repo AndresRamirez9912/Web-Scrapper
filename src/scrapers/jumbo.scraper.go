@@ -9,9 +9,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-var jumboData = &scraping.JumboProduct{
-	Description: make(map[int]string),
-}
+var jumboData = &scraping.JumboProduct{}
 
 func SendJumboCollyRequest(productURL string) (*scraping.JumboProduct, error) {
 	// Clean the objData
@@ -47,14 +45,18 @@ func SendJumboCollyRequest(productURL string) (*scraping.JumboProduct, error) {
 		return nil, err
 	}
 
+	// Get the Last Information
+	scrapedElement.ProductURL = productURL
+
 	return scrapedElement, nil
 }
 
 func jumboOnHTML(h *colly.HTMLElement) {
 	if jumboData.Name == "" {
+		jumboData.Id = h.ChildText(constants.JUMBO_QUERY_PRODUCT_ID)
 		jumboData.Name = h.ChildText(constants.JUMBO_QUERY_NAME)
 		jumboData.ImageURL = h.ChildAttr(constants.JUMBO_QUERY_IMAGE_URL, "src")
-		jumboData.Description[0] = h.ChildText(constants.JUMBO_QUERY_DESCRIPTION)
+		jumboData.Description = h.ChildText(constants.JUMBO_QUERY_DESCRIPTION)
 		jumboData.CurrentPrice = h.ChildText(constants.JUMBO_QUERY_CURRENTPRICE)
 		jumboData.HighPrice = h.ChildText(constants.JUMBO_QUERY_HIGHTPRICE)
 		jumboData.Disccount = h.ChildText(constants.JUMBO_QUERY_DISCOUNT)

@@ -41,6 +41,7 @@ const JUMBO_QUERY_DESCRIPTION = "div.vtex-store-components-3-x-content.h-auto"
 const JUMBO_QUERY_CURRENTPRICE = "div#items-price.flex.c-emphasis.tiendasjumboqaio-jumbo-minicart-2-x-cencoPrice div.tiendasjumboqaio-jumbo-minicart-2-x-price"
 const JUMBO_QUERY_HIGHTPRICE = "div.b.ml2.tiendasjumboqaio-jumbo-minicart-2-x-cencoListPriceWrapper div.tiendasjumboqaio-jumbo-minicart-2-x-price"
 const JUMBO_QUERY_DISCOUNT = "div.pr7.items-stretch.vtex-flex-layout-0-x-stretchChildrenWidth.flex span.vtex-product-price-1-x-currencyContainer.vtex-product-price-1-x-currencyContainer--summary"
+const JUMBO_QUERY_PRODUCT_ID = "span.vtex-product-identifier-0-x-product-identifier__value"
 
 // Cache
 const CACHE = "./cache"
