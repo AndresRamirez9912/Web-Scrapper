@@ -8,21 +8,17 @@ type JumboProduct struct {
 	HighPrice    string
 	ProductURL   string
 	Brand        string
-	Description  map[int]string
+	Description  string
 	ImageURL     string
 }
 
 func (A *JumboProduct) CreateProductStructure(userId string) Product {
-	description := "&"
-	for _, v := range A.Description {
-		description = v + description
-	}
 	return Product{
 		Product_id:      A.Id,
 		User_product_id: userId + A.Id,
 		Name:            A.Name,
 		Brand:           A.Brand,
-		Description:     description,
+		Description:     A.Description,
 		ImageURL:        A.ImageURL,
 		ProductURL:      A.ProductURL,
 		Current_price:   A.CurrentPrice,
