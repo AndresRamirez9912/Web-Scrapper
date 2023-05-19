@@ -148,7 +148,8 @@ func createUserTable(connection *sql.DB) error {
 		email VARCHAR(50) NOT NULL UNIQUE CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
 		password VARCHAR(100) NOT NULL,
 		createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		session_cookie VARCHAR(50) NOT NULL UNIQUE
+		session_cookie VARCHAR(50) NOT NULL UNIQUE,
+		email_verification BOOLEAN DEFAULT FALSE
 	)`
 
 	// Execute the SQL command

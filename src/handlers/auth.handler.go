@@ -1,11 +1,15 @@
 package handlers
 
 import (
+	"bytes"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
 	"webScraper/src/constants"
 	"webScraper/src/database"
+	"webScraper/src/models/auth"
+	services "webScraper/src/services/emails"
 	"webScraper/src/utils"
 
 	"github.com/google/uuid"
@@ -30,6 +34,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error creating the user from Body")
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Send the Verification Email
+	err = sendVerificationEmail(user)
+	if err != nil {
+		log.Println("Error sending the email verification")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -98,4 +110,39 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect to the main page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func sendVerificationEmail(user *auth.User) error {
+	var body bytes.Buffer
+
+	// Get the Template with the values
+	template, err := template.ParseFiles("src/services/emails/templates/emailVerification.template.html")
+	if err != nil {
+		log.Fatal("Error Trying to get the template ", err)
+		return err
+	}
+
+	// Create the struct with the data to send to the template
+	data := struct {
+		UserName string
+		Link     string
+	}{
+		UserName: user.Name,
+		Link:     "google.com",
+	}
+
+	// Execute the template and get the string
+	err = template.Execute(&body, data)
+	if err != nil {
+		log.Fatal("Error Trying to execute the template ", err)
+		return err
+	}
+
+	// Send the email
+	err = services.SendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String())
+	if err != nil {
+		log.Fatal("Error Sending the email", err)
+		return err
+	}
+	return nil
 }

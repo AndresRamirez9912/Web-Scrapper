@@ -34,6 +34,14 @@ func CheckAuth(next http.Handler) http.Handler {
 			return
 		}
 
+		// Check if the email was validated
+		validation, err := database.CheckUserValidated(userId)
+		if !validation {
+			log.Println("Please Verify your email")
+			http.Redirect(w, r, "/login", http.StatusUnauthorized)
+			return
+		}
+
 		// Send the userId in the context to the handler
 		ctx := context.WithValue(r.Context(), constants.USER_ID, userId)
 		next.ServeHTTP(w, r.WithContext(ctx))
