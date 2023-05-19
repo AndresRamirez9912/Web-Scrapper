@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
-	"webScraper/src/scrapers"
+	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
 
