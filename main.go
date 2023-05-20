@@ -47,6 +47,7 @@ func main() {
 	router.Get("/", handlers.Index)
 	router.Post("/register", handlers.Register)
 	router.Post("/login", handlers.Login)
+	router.Get("/verify", handlers.VerifyEmail)
 
 	// Handlers with Auth
 	auth.Get("/exito", handlers.GetExitoData)

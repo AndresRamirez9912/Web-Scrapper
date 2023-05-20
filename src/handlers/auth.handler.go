@@ -1,14 +1,12 @@
 package handlers
 
 import (
-	"bytes"
-	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 	"webScraper/src/constants"
 	"webScraper/src/database"
-	"webScraper/src/models/auth"
 	services "webScraper/src/services/emails"
 	"webScraper/src/utils"
 
@@ -38,7 +36,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the Verification Email
-	err = sendVerificationEmail(user)
+	err = services.SendVerificationEmail(user)
 	if err != nil {
 		log.Println("Error sending the email verification")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -112,37 +110,40 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func sendVerificationEmail(user *auth.User) error {
-	var body bytes.Buffer
+func VerifyEmail(w http.ResponseWriter, r *http.Request) {
+	// Get the Query Parameters
+	user_id := r.URL.Query().Get("user")
+	timeStamp := r.URL.Query().Get("time")
 
-	// Get the Template with the values
-	template, err := template.ParseFiles("src/services/emails/templates/emailVerification.template.html")
+	// Check if the timestamp is recently
+	date, err := strconv.ParseInt(timeStamp, 10, 64)
 	if err != nil {
-		log.Fatal("Error Trying to get the template ", err)
-		return err
+		log.Fatal("Error reading the token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	// Create the struct with the data to send to the template
-	data := struct {
-		UserName string
-		Link     string
-	}{
-		UserName: user.Name,
-		Link:     "google.com",
+	if date > time.Now().Add(12*time.Minute).Unix() {
+		log.Fatal("The token expired")
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	// Execute the template and get the string
-	err = template.Execute(&body, data)
+	// Check if the userId exists
+	exist, err := database.CheckIfUserExists(user_id)
+	if err != nil || !exist {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Validate Email
+	err = database.VerifyEmail(user_id)
 	if err != nil {
-		log.Fatal("Error Trying to execute the template ", err)
-		return err
+		log.Fatal("Error Verifying the Email")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	// Send the email
-	err = services.SendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String())
-	if err != nil {
-		log.Fatal("Error Sending the email", err)
-		return err
-	}
-	return nil
+	// Redirect to the main page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

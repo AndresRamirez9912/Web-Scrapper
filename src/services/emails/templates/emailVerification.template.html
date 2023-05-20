@@ -8,9 +8,17 @@
 </head>
 <body>
     <h1> Bienvenido {{.UserName}}</h1>
+    <br>
     <p> Es un placer darte la bienvenida y agradecerte por registrarte en
         nuestra aplicaion. Para finalizar el proceso de registro, por favor 
         ingresa al siguiente link para verificar tu correo. </p>
     <p> Link -> <a href={{.Link}}>{{.Link}}</a> </p>
+    <br>
+    <footer>
+        <p>
+            Este correo tienen una validacion de 12 minutos, por favor
+            ingrese al link tan pronto como lo reciba
+        </p>
+    </footer>
 </body>
 </html>
