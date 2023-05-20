@@ -225,3 +225,88 @@ func updatePrice(connection *sql.DB, product scraping.Product) error {
 	log.Println("Price Updated Successfully")
 	return nil
 }
+
+func VerifyEmail(userId string) error {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error getting the user, DB can't connect")
+		return err
+	}
+
+	sentence := `UPDATE users SET email_verification='TRUE' WHERE user_id='%s'`
+	sqlSentence := fmt.Sprintf(sentence, userId)
+
+	// Execute the SQL command
+	_, err = connection.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Errorupdating the email validation field", err)
+		return err
+	}
+
+	log.Println("Email validated successfully Successfully")
+	return nil
+}
+
+func CheckUserValidated(userId string) (bool, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error getting the user, DB can't connect")
+		return false, err
+	}
+
+	// Execute the SQL sentence
+	sqlSentence := fmt.Sprintf("SELECT email_verification FROM users WHERE user_id = '%s'", userId)
+	response, err := connection.Query(sqlSentence)
+	if err != nil {
+		return false, err
+	}
+
+	// Extract the name of the product if it exits
+	var user_validation bool
+	for response.Next() {
+		err = response.Scan(&user_validation)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	defer response.Close()
+	return user_validation, nil
+}
+
+func CheckIfUserExists(userId string) (bool, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Fatal("Error getting the user, DB can't connect")
+		return false, err
+	}
+
+	// Check if the user exits
+	sqlSentence := fmt.Sprintf("SELECT user_id FROM users WHERE user_id = '%s'", userId)
+	response, err := connection.Query(sqlSentence)
+	defer response.Close()
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return false, err
+	}
+
+	// Extract the name of the product if it exits
+	var user string
+	for response.Next() {
+		err = response.Scan(&user)
+		if err != nil {
+			log.Println("User not Foud", err)
+			return false, err
+		}
+	}
+
+	// Check if the current price is equal to the previously price
+	if user == userId {
+		return true, nil
+	}
+
+	return true, nil
+}

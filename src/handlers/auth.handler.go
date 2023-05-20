@@ -3,9 +3,11 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 	"webScraper/src/constants"
 	"webScraper/src/database"
+	services "webScraper/src/services/emails"
 	"webScraper/src/utils"
 
 	"github.com/google/uuid"
@@ -30,6 +32,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error creating the user from Body")
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Send the Verification Email
+	err = services.SendVerificationEmail(user)
+	if err != nil {
+		log.Println("Error sending the email verification")
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -95,6 +105,44 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Response to the client
 	http.SetCookie(w, cookie)
 	w.Header().Add(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
+
+	// Redirect to the main page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func VerifyEmail(w http.ResponseWriter, r *http.Request) {
+	// Get the Query Parameters
+	user_id := r.URL.Query().Get("user")
+	timeStamp := r.URL.Query().Get("time")
+
+	// Check if the timestamp is recently
+	date, err := strconv.ParseInt(timeStamp, 10, 64)
+	if err != nil {
+		log.Fatal("Error reading the token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if date > time.Now().Add(12*time.Minute).Unix() {
+		log.Fatal("The token expired")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Check if the userId exists
+	exist, err := database.CheckIfUserExists(user_id)
+	if err != nil || !exist {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Validate Email
+	err = database.VerifyEmail(user_id)
+	if err != nil {
+		log.Fatal("Error Verifying the Email")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// Redirect to the main page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
