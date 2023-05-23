@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"webScraper/src/models/auth"
@@ -11,7 +11,7 @@ import (
 
 func GetProductURL(r *http.Request) (string, error) {
 	// Get the body
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("Error receiving the request ", err)
 		return "", err
@@ -28,7 +28,7 @@ func GetProductURL(r *http.Request) (string, error) {
 }
 
 func GetBody(r *http.Request) (*auth.User, error) {
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("Error reading the body request")
 		return nil, err

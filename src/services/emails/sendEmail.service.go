@@ -45,7 +45,8 @@ func SendVerificationEmail(user *auth.User) error {
 	// Create the struct with the data to send to the template
 	url, err := url.Parse("http://localhost:3000/verify")
 	if err != nil {
-
+		log.Println("Error Creating the Verification Link ", err)
+		return err
 	}
 	query := url.Query()
 	query.Set("user", user.Id)
