@@ -58,7 +58,10 @@ func main() {
 
 	// Create the Cron Job
 	cron := cron.New()
-	cron.AddFunc("0 * * * *", services.CheckProducts) // Check The prices every hour (at o'clock)
+	_, err = cron.AddFunc("0 * * * *", services.CheckProducts) // Check The prices every hour (at o'clock)
+	if err != nil {
+		log.Println("Error creating the Cron Job: ", err)
+	}
 	cron.Start()
 
 	// Start server

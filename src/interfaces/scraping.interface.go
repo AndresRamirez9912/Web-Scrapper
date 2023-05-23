@@ -13,13 +13,6 @@ type Scraper struct {
 	AllowedDomains []string
 }
 
-type scraperMethods interface {
-	InitCollector() *colly.Collector
-	OnRequest(r *colly.Request)
-	OnResponse(r *colly.Response)
-	OnError(r *colly.Response, err error)
-}
-
 func (s Scraper) InitCollector() *colly.Collector {
 	collector := colly.NewCollector(
 		colly.AllowedDomains(s.AllowedDomains...),

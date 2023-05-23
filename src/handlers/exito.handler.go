@@ -39,7 +39,11 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
-	w.WriteHeader(http.StatusOK) // Wite status and previous headers into request
-	w.Write(dataResponse)        // Send body
+	w.WriteHeader(http.StatusOK)   // Wite status and previous headers into request
+	_, err = w.Write(dataResponse) // Send body
+	if err != nil {
+		log.Println("Error sending the response ", err)
+		return
+	}
 
 }

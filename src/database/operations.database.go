@@ -72,7 +72,10 @@ func TrackProduct(product scraping.Product, userId string) error {
 	}
 
 	// Close the connection
-	defer CloseConnection(connection)
+	err = CloseConnection(connection)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -272,7 +275,12 @@ func CheckUserValidated(userId string) (bool, error) {
 		}
 	}
 
-	defer response.Close()
+	// Close the connection
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the connection with the DB")
+		return false, err
+	}
 	return user_validation, nil
 }
 
@@ -287,7 +295,6 @@ func CheckIfUserExists(userId string) (bool, error) {
 	// Check if the user exits
 	sqlSentence := fmt.Sprintf("SELECT user_id FROM users WHERE user_id = '%s'", userId)
 	response, err := connection.Query(sqlSentence)
-	defer response.Close()
 	if err != nil {
 		log.Println("Error making the query for getting the price ", err)
 		return false, err
@@ -308,6 +315,13 @@ func CheckIfUserExists(userId string) (bool, error) {
 		return true, nil
 	}
 
+	// Close the connection
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the connection with the DB")
+		return false, err
+	}
+
 	return true, nil
 }
 
@@ -320,9 +334,8 @@ func GetAllProducts() ([]string, error) {
 	}
 
 	// Check if the user exits
-	sqlSentence := fmt.Sprintf("SELECT productUrl FROM product")
+	sqlSentence := "SELECT productUrl FROM product"
 	response, err := connection.Query(sqlSentence)
-	defer response.Close()
 	if err != nil {
 		log.Println("Error making the query for getting the price ", err)
 		return nil, err
@@ -338,6 +351,12 @@ func GetAllProducts() ([]string, error) {
 			return nil, err
 		}
 		products = append(products, productURL)
+	}
+
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the connection with the DB")
+		return nil, err
 	}
 
 	return products, nil
