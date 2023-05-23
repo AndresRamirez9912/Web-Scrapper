@@ -7,7 +7,6 @@ import (
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/extensions"
-	"github.com/gocolly/colly/proxy"
 )
 
 type Scraper struct {
@@ -30,11 +29,11 @@ func (s Scraper) InitCollector() *colly.Collector {
 	extensions.RandomUserAgent(collector) // Assign a random User Agent
 
 	// Assign the Proxy
-	rp, err := proxy.RoundRobinProxySwitcher("http://20.206.106.192:8123", "http://65.109.228.231:8080")
-	if err != nil {
-		log.Fatal(err)
-	}
-	collector.SetProxyFunc(rp)
+	// rp, err := proxy.RoundRobinProxySwitcher("http://20.206.106.192:8123", "http://65.109.228.231:8080")
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// collector.SetProxyFunc(rp)
 	return collector
 }
 

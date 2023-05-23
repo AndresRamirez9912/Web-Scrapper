@@ -14,6 +14,8 @@ import (
 var amazonData = &scraping.AmazonProduct{}
 
 func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) {
+	// Clear the Object
+	amazonData = &scraping.AmazonProduct{}
 
 	// Create Object interface
 	scraper := interfaces.Scraper{
@@ -35,21 +37,21 @@ func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) 
 	// Visit the page
 	err := collector.Visit(productURL)
 	if err != nil {
-		log.Fatal("Error Visiting the page ", err)
+		log.Println("Error Visiting the page ", err)
 	}
 
 	collector.Wait()
 
 	data, err := handleResponse()
 	if err != nil {
-		log.Fatal("Error getting data from scraping")
+		log.Println("Error getting data from scraping")
 		return nil, err
 	}
 
 	// Get the Product Id from the URL
 	productId, err := getProductId(productURL)
 	if err != nil {
-		log.Fatal("Error getting the Id of the product")
+		log.Println("Error getting the Id of the product")
 		return nil, err
 	}
 

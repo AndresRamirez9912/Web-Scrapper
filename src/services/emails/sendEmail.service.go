@@ -38,7 +38,7 @@ func SendVerificationEmail(user *auth.User) error {
 	// Get the Template with the values
 	template, err := template.ParseFiles("src/services/emails/templates/emailVerification.template.html")
 	if err != nil {
-		log.Fatal("Error Trying to get the template ", err)
+		log.Println("Error Trying to get the template ", err)
 		return err
 	}
 
@@ -63,14 +63,14 @@ func SendVerificationEmail(user *auth.User) error {
 	// Execute the template and get the string
 	err = template.Execute(&body, data)
 	if err != nil {
-		log.Fatal("Error Trying to execute the template ", err)
+		log.Println("Error Trying to execute the template ", err)
 		return err
 	}
 
 	// Send the email
 	err = sendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String())
 	if err != nil {
-		log.Fatal("Error Sending the email", err)
+		log.Println("Error Sending the email", err)
 		return err
 	}
 	return nil

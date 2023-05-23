@@ -12,14 +12,14 @@ func CreateUser(user *auth.User) error {
 	// Hash the password
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatal("Error hashing the password")
+		log.Println("Error hashing the password")
 		return err
 	}
 
 	// Create connection to the DB
 	db, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error creating the user, DB can't connect")
+		log.Println("Error creating the user, DB can't connect")
 		return err
 	}
 
@@ -34,7 +34,7 @@ func CreateUser(user *auth.User) error {
 	// Close the connection
 	err = CloseConnection(db)
 	if err != nil {
-		log.Fatal("Error closing in users ", err)
+		log.Println("Error closing in users ", err)
 		return err
 	}
 	return nil
@@ -44,7 +44,7 @@ func GetUserByEmail(email string) (string, error) {
 	// Create connection to the DB
 	db, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error creating the user, DB can't connect")
+		log.Println("Error creating the user, DB can't connect")
 		return "", err
 	}
 
@@ -52,7 +52,7 @@ func GetUserByEmail(email string) (string, error) {
 	sqlSentence := fmt.Sprintf("SELECT password FROM users WHERE email = '%s'", email)
 	response, err := db.Query(sqlSentence)
 	if err != nil {
-		log.Fatal("Error Creating the the user ", err)
+		log.Println("Error Creating the the user ", err)
 		return "", err
 	}
 
@@ -73,7 +73,7 @@ func GetUserbyCookie(session string) (string, error) {
 	// Create connection to the DB
 	db, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error getting the user, DB can't connect")
+		log.Println("Error getting the user, DB can't connect")
 		return "", err
 	}
 
@@ -81,7 +81,7 @@ func GetUserbyCookie(session string) (string, error) {
 	sqlSentence := fmt.Sprintf("SELECT user_id FROM users WHERE session_cookie = '%s'", session)
 	response, err := db.Query(sqlSentence)
 	if err != nil {
-		log.Fatal("Cookie not found ", err)
+		log.Println("Cookie not found ", err)
 		return "", err
 	}
 
@@ -103,7 +103,7 @@ func UpdateCookie(userEmail string, newCookie string) error {
 	// Create connection to the DB
 	db, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error getting the user, DB can't connect")
+		log.Println("Error getting the user, DB can't connect")
 		return err
 	}
 
@@ -111,7 +111,7 @@ func UpdateCookie(userEmail string, newCookie string) error {
 	sqlSentence := fmt.Sprintf("UPDATE users SET session_cookie='%s' WHERE email='%s'", newCookie, userEmail)
 	_, err = db.Exec(sqlSentence)
 	if err != nil {
-		log.Fatal("Error updating cookie ", err)
+		log.Println("Error updating cookie ", err)
 		return err
 	}
 

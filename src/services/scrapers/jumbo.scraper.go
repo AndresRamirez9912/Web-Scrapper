@@ -13,7 +13,7 @@ var jumboData = &scraping.JumboProduct{}
 
 func SendJumboCollyRequest(productURL string) (*scraping.JumboProduct, error) {
 	// Clean the objData
-	jumboData.Name = ""
+	jumboData = &scraping.JumboProduct{}
 
 	// Create a collector to setup the data searcher
 	scraper := interfaces.Scraper{
@@ -34,14 +34,14 @@ func SendJumboCollyRequest(productURL string) (*scraping.JumboProduct, error) {
 	// Visit the page
 	err := collector.Visit(productURL)
 	if err != nil {
-		log.Fatal("Error Visiting the page ", err)
+		log.Println("Error Visiting the page ", err)
 	}
 
 	collector.Wait()
 
 	scrapedElement, err := jumboHandleResponse()
 	if err != nil {
-		log.Fatal("Error getting data from scraping")
+		log.Println("Error getting data from scraping")
 		return nil, err
 	}
 

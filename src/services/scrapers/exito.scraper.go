@@ -2,9 +2,7 @@ package scrapers
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
-	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
 	"webScraper/src/models/scraping"
@@ -16,6 +14,9 @@ var exitoProduct = &scraping.ExitoProduct{}
 var exitoData string
 
 func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
+	// Clear the Object
+	exitoProduct = &scraping.ExitoProduct{}
+	exitoData = ""
 
 	// Create a collector to setup the data searcher
 	exitoScraper := interfaces.Scraper{
@@ -36,24 +37,17 @@ func SendExitoCollyRequest(productURL string) (*scraping.ExitoProduct, error) {
 	// Visit the page
 	err := collector.Visit(productURL)
 	if err != nil {
-		log.Fatal("Error Visiting the page ", err)
+		log.Println("Error Visiting the page ", err)
+		return nil, err
 	}
 
 	collector.Wait()
 
 	exitoData, err := exitoHandleResponse()
 	if err != nil {
-		log.Fatal("Error getting data from scraping")
+		log.Println("Error getting data from scraping")
 		return nil, err
 	}
-
-	// Get the additional information
-	productId, err := getExitoProductId(productURL)
-	if err != nil {
-		return nil, err
-	}
-
-	exitoData.Id = productId
 
 	return exitoData, nil
 }
@@ -68,17 +62,8 @@ func exitoOnHTML(h *colly.HTMLElement) {
 func exitoHandleResponse() (*scraping.ExitoProduct, error) {
 	err := json.Unmarshal([]byte(exitoData), exitoProduct)
 	if err != nil {
-		log.Fatal("Error unmarshaling scraping response ", err)
+		log.Println("Error unmarshaling scraping response ", err)
 		return nil, err
 	}
 	return exitoProduct, nil
-}
-
-func getExitoProductId(productURL string) (string, error) {
-	elementsURL := strings.Split(productURL, "-")
-	productId := strings.Replace(elementsURL[len(elementsURL)-1], "/p", "", -1)
-	if productId == "" {
-		return "", errors.New("Product Id not found")
-	}
-	return productId, nil
 }

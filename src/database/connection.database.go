@@ -45,13 +45,13 @@ func CreateTables(db *sql.DB) error {
 	sqlSentence := "CREATE DATABASE webscraping"
 	_, err := db.Exec(sqlSentence)
 	if err != nil {
-		log.Fatal("Error Creating the DataBase Web Scraping", err)
+		log.Println("Error Creating the DataBase Web Scraping", err)
 	}
 
 	// Close the general connection
 	err = CloseConnection(db)
 	if err != nil {
-		log.Fatal("Error Closing the connection to the general DB")
+		log.Println("Error Closing the connection to the general DB")
 		return err
 	}
 

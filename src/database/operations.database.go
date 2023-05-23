@@ -230,7 +230,7 @@ func VerifyEmail(userId string) error {
 	// Create connection to the DB
 	connection, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error getting the user, DB can't connect")
+		log.Println("Error getting the user, DB can't connect")
 		return err
 	}
 
@@ -252,7 +252,7 @@ func CheckUserValidated(userId string) (bool, error) {
 	// Create connection to the DB
 	connection, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error getting the user, DB can't connect")
+		log.Println("Error getting the user, DB can't connect")
 		return false, err
 	}
 
@@ -280,7 +280,7 @@ func CheckIfUserExists(userId string) (bool, error) {
 	// Create connection to the DB
 	connection, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
-		log.Fatal("Error getting the user, DB can't connect")
+		log.Println("Error getting the user, DB can't connect")
 		return false, err
 	}
 
@@ -309,4 +309,36 @@ func CheckIfUserExists(userId string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func GetAllProducts() ([]string, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error getting the user, DB can't connect")
+		return nil, err
+	}
+
+	// Check if the user exits
+	sqlSentence := fmt.Sprintf("SELECT productUrl FROM product")
+	response, err := connection.Query(sqlSentence)
+	defer response.Close()
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return nil, err
+	}
+
+	// Extract the name of the product if it exits
+	var products []string
+	var productURL string
+	for response.Next() {
+		err = response.Scan(&productURL)
+		if err != nil {
+			log.Println("User not Foud", err)
+			return nil, err
+		}
+		products = append(products, productURL)
+	}
+
+	return products, nil
 }
