@@ -6,16 +6,18 @@ import (
 	"webScraper/src/database"
 	"webScraper/src/handlers"
 	"webScraper/src/middleware"
+	"webScraper/src/services"
 
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
+	"gopkg.in/robfig/cron.v2"
 )
 
 func main() {
 	// Load .env Variables
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env File")
+		log.Println("Error loading .env File")
 	}
 
 	// Check If the DB exist
@@ -30,7 +32,7 @@ func main() {
 		// Create the tables
 		err = database.CreateTables(DB)
 		if err != nil {
-			log.Fatal("Error creating the database")
+			log.Println("Error creating the database")
 			return
 		}
 	}
@@ -54,10 +56,15 @@ func main() {
 	auth.Get("/amazon", handlers.GetAmazonData)
 	auth.Get("/jumbo", handlers.GetJumboData)
 
+	// Create the Cron Job
+	cron := cron.New()
+	cron.AddFunc("0 * * * *", services.CheckProducts) // Check The prices every hour (at o'clock)
+	cron.Start()
+
 	// Start server
 	log.Println("Starting Server at port: 3000")
 	err = http.ListenAndServe(":3000", router)
 	if err != nil {
-		log.Fatal("Error creating the server: ", err)
+		log.Println("Error creating the server: ", err)
 	}
 }

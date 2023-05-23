@@ -17,19 +17,19 @@ func GetJumboData(w http.ResponseWriter, r *http.Request) {
 	// Get the URL of the product
 	URL, err := utils.GetProductURL(r)
 	if err != nil {
-		log.Fatal("Error Getting the URL of the Product ", err)
+		log.Println("Error Getting the URL of the Product ", err)
 	}
 
 	// Make the Scraping to the page
 	scrapedProduct, err := scrapers.SendJumboCollyRequest(URL)
 	if err != nil {
-		log.Fatal("Error Getting the data from the craping ", err)
+		log.Println("Error Getting the data from the craping ", err)
 	}
 
 	// Send the response
 	dataResponse, err := json.Marshal(scrapedProduct)
 	if err != nil {
-		log.Fatal("Error Serializing the obtained data ", err)
+		log.Println("Error Serializing the obtained data ", err)
 	}
 
 	// Create the product in the DB

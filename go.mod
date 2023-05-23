@@ -10,6 +10,7 @@ require (
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.8.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5
 )
 
 require (

@@ -47,7 +47,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
 		Name:     constants.SESSION_TOKEN,
 		Value:    cookie_session,
-		Expires:  time.Now().Add(60 * time.Minute), // Each session expires after 1 hour
+		Expires:  time.Now().Add(7200 * time.Hour), // Each session expires after 1 year
 		HttpOnly: true,
 	}
 
@@ -90,7 +90,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
 		Name:     constants.SESSION_TOKEN,
 		Value:    session_cookie,
-		Expires:  time.Now().Add(60 * time.Minute), // Each session expires after 1 hour
+		Expires:  time.Now().Add(7200 * time.Hour), // Each session expires after 1 year
 		HttpOnly: true,
 	}
 
@@ -118,13 +118,13 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	// Check if the timestamp is recently
 	date, err := strconv.ParseInt(timeStamp, 10, 64)
 	if err != nil {
-		log.Fatal("Error reading the token")
+		log.Println("Error reading the token")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if date > time.Now().Add(12*time.Minute).Unix() {
-		log.Fatal("The token expired")
+		log.Println("The token expired")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -139,7 +139,7 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	// Validate Email
 	err = database.VerifyEmail(user_id)
 	if err != nil {
-		log.Fatal("Error Verifying the Email")
+		log.Println("Error Verifying the Email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -13,7 +13,7 @@ func GetProductURL(r *http.Request) (string, error) {
 	// Get the body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal("Error receiving the request ", err)
+		log.Println("Error receiving the request ", err)
 		return "", err
 	}
 
@@ -21,7 +21,7 @@ func GetProductURL(r *http.Request) (string, error) {
 	product := &models.ProductRequest{}
 	err = json.Unmarshal(body, product)
 	if err != nil {
-		log.Fatal("Error Getting the data from the body request ", err)
+		log.Println("Error Getting the data from the body request ", err)
 		return "", err
 	}
 	return product.ProductURL, nil
