@@ -1,6 +1,6 @@
 package constants
 
-const MY_EMAIL = "andres.ramirez9912@gmail.com"
+const MY_EMAIL = "MY_EMAIL"
 const ACCOUNT_VERIFICATION_SUBJECT = "Verificacion de correo electronico Tracking de precios"
 const SMTP_HOST = "smtp.gmail.com"
 const FROM_HEADER = "From"
@@ -8,3 +8,8 @@ const TO_HEADER = "To"
 const SUBJECT_HEADER = "Subject"
 const CONTENT_TYPE_EMAIL = "text/html"
 const EMAIL_PASSWORD = "EMAIL_PASSWORD"
+const APP_NAME = "Price Tracker"
+const TEMPLATE_ADDRESS = "src/services/emails/templates/emailVerification.template.html"
+const USER_QUERY = "user"
+const TIME_QUERY = "time"
+const VERIFICATION_URL = "http://localhost:3000/verify"

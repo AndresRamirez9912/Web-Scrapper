@@ -17,13 +17,13 @@ import (
 func sendEmail(toEmail string, subject string, body string) error {
 	// Create the message
 	msg := gomail.NewMessage()
-	msg.SetHeader(constants.FROM_HEADER, constants.MY_EMAIL)
+	msg.SetHeader(constants.FROM_HEADER, os.Getenv(constants.MY_EMAIL))
 	msg.SetHeader(constants.TO_HEADER, toEmail)
 	msg.SetHeader(constants.SUBJECT_HEADER, subject)
 	msg.SetBody(constants.CONTENT_TYPE_EMAIL, body)
 
 	// Send the Email
-	sender := gomail.NewDialer(constants.SMTP_HOST, 587, constants.MY_EMAIL, os.Getenv(constants.EMAIL_PASSWORD))
+	sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
 	err := sender.DialAndSend(msg)
 	if err != nil {
 		log.Panic("Error sending the email ", err)
@@ -36,20 +36,21 @@ func SendVerificationEmail(user *auth.User) error {
 	var body bytes.Buffer
 
 	// Get the Template with the values
-	template, err := template.ParseFiles("src/services/emails/templates/emailVerification.template.html")
+	template, err := template.ParseFiles(constants.TEMPLATE_ADDRESS)
 	if err != nil {
 		log.Println("Error Trying to get the template ", err)
 		return err
 	}
 
 	// Create the struct with the data to send to the template
-	url, err := url.Parse("http://localhost:3000/verify")
+	url, err := url.Parse(constants.VERIFICATION_URL)
 	if err != nil {
-
+		log.Println("Error Creating the Verification Link ", err)
+		return err
 	}
 	query := url.Query()
-	query.Set("user", user.Id)
-	query.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
+	query.Set(constants.USER_QUERY, user.Id)
+	query.Set(constants.TIME_QUERY, strconv.FormatInt(time.Now().Unix(), 10))
 	url.RawQuery = query.Encode()
 
 	data := struct {

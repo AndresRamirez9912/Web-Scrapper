@@ -36,7 +36,7 @@ func CheckAuth(next http.Handler) http.Handler {
 
 		// Check if the email was validated
 		validation, err := database.CheckUserValidated(userId)
-		if !validation {
+		if !validation || err != nil {
 			log.Println("Please Verify your email")
 			http.Redirect(w, r, "/login", http.StatusUnauthorized)
 			return
