@@ -9,12 +9,13 @@ import (
 	"text/template"
 	"time"
 	"webScraper/src/constants"
+	"webScraper/src/interfaces"
 	"webScraper/src/models/auth"
 
 	"gopkg.in/gomail.v2"
 )
 
-func sendEmail(toEmail string, subject string, body string) error {
+func sendEmail(toEmail string, subject string, body string, sender interfaces.Senders) error {
 	// Create the message
 	msg := gomail.NewMessage()
 	msg.SetHeader(constants.FROM_HEADER, os.Getenv(constants.MY_EMAIL))
@@ -23,10 +24,9 @@ func sendEmail(toEmail string, subject string, body string) error {
 	msg.SetBody(constants.CONTENT_TYPE_EMAIL, body)
 
 	// Send the Email
-	sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
 	err := sender.DialAndSend(msg)
 	if err != nil {
-		log.Panic("Error sending the email ", err)
+		log.Println("Error sending the email ", err)
 		return err
 	}
 	return nil
@@ -69,7 +69,8 @@ func SendVerificationEmail(user *auth.User) error {
 	}
 
 	// Send the email
-	err = sendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String())
+	sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
+	err = sendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String(), sender)
 	if err != nil {
 		log.Println("Error Sending the email", err)
 		return err
