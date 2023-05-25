@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 	"webScraper/src/constants"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/gomail.v2"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +38,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the Verification Email
-	err = services.SendVerificationEmail(user)
+	sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
+	err = services.SendVerificationEmail(user, sender)
 	if err != nil {
 		log.Println("Error sending the email verification")
 		w.WriteHeader(http.StatusInternalServerError)

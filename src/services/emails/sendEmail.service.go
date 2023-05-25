@@ -32,7 +32,7 @@ func sendEmail(toEmail string, subject string, body string, sender interfaces.Se
 	return nil
 }
 
-func SendVerificationEmail(user *auth.User) error {
+func SendVerificationEmail(user *auth.User, sender interfaces.Senders) error {
 	var body bytes.Buffer
 
 	// Get the Template with the values
@@ -69,7 +69,6 @@ func SendVerificationEmail(user *auth.User) error {
 	}
 
 	// Send the email
-	sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
 	err = sendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String(), sender)
 	if err != nil {
 		log.Println("Error Sending the email", err)
