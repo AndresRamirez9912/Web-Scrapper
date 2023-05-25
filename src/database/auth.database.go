@@ -23,6 +23,15 @@ func CreateUser(user *auth.User) error {
 		return err
 	}
 
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
+
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("INSERT INTO users (user_id, name, email, password, session_cookie) VALUES ('%s', '%s', '%s', '%s', '%s');", user.Id, user.Name, user.Email, string(hash), user.Session_cookie)
 	_, err = db.Exec(sqlSentence)
@@ -31,12 +40,6 @@ func CreateUser(user *auth.User) error {
 		return err
 	}
 
-	// Close the connection
-	err = CloseConnection(db)
-	if err != nil {
-		log.Println("Error closing in users ", err)
-		return err
-	}
 	return nil
 }
 
@@ -47,6 +50,15 @@ func GetUserByEmail(email string) (string, error) {
 		log.Println("Error creating the user, DB can't connect")
 		return "", err
 	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
 
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("SELECT password FROM users WHERE email = '%s'", email)
@@ -65,7 +77,7 @@ func GetUserByEmail(email string) (string, error) {
 			return "", err
 		}
 	}
-	defer response.Close()
+	response.Close()
 	return password, nil
 }
 
@@ -76,6 +88,15 @@ func GetUserbyCookie(session string) (string, error) {
 		log.Println("Error getting the user, DB can't connect")
 		return "", err
 	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
 
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("SELECT user_id FROM users WHERE session_cookie = '%s'", session)
@@ -94,7 +115,7 @@ func GetUserbyCookie(session string) (string, error) {
 			return "", err
 		}
 	}
-	defer response.Close()
+	response.Close()
 
 	return id, nil
 }
@@ -106,6 +127,15 @@ func UpdateCookie(userEmail string, newCookie string) error {
 		log.Println("Error getting the user, DB can't connect")
 		return err
 	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
 
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("UPDATE users SET session_cookie='%s' WHERE email='%s'", newCookie, userEmail)

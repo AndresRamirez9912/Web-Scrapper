@@ -66,6 +66,15 @@ func CreateTables(db *sql.DB) error {
 		return err
 	}
 
+	// Close the connection
+	defer func() {
+		err = CloseConnection(dbScraping)
+		if err != nil {
+			log.Println("Error Closing the connecton to the webscraping DB ", err)
+			return
+		}
+	}()
+
 	// Createthe tables
 	err = createUserTable(dbScraping)
 	if err != nil {
@@ -97,12 +106,6 @@ func CreateTables(db *sql.DB) error {
 		return err
 	}
 
-	// Close the connection
-	err = CloseConnection(dbScraping)
-	if err != nil {
-		log.Println("Error Closing the connecton to the webscraping DB ", err)
-		return err
-	}
 	return nil
 }
 
@@ -114,6 +117,15 @@ func ClearDatabase() error {
 		return err
 	}
 
+	// Close connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error Closing the connecton to the webscraping DB ", err)
+			return
+		}
+	}()
+
 	sqlSentence := "DROP DATABASE webScraping"
 	_, err = db.Exec(sqlSentence)
 	if err != nil {
@@ -121,12 +133,6 @@ func ClearDatabase() error {
 		return err
 	}
 
-	// Close connection
-	err = CloseConnection(db)
-	if err != nil {
-		log.Println("Error Closing the connecton to the webscraping DB ", err)
-		return err
-	}
 	return nil
 }
 
