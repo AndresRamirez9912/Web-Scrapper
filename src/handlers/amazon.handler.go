@@ -22,7 +22,14 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	scrapedProduct, err := scrapers.SendAmazonCollyRequest(URL)
+	// Create Object interface
+	scraper := interfaces.Scraper{
+		AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN},
+	}
+
+	// Create Collector
+	collector := scraper.InitCollector()
+	scrapedProduct, err := scrapers.SendAmazonCollyRequest(URL, scraper, collector)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)
 		return

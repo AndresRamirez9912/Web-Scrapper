@@ -13,17 +13,9 @@ import (
 
 var amazonData = &scraping.AmazonProduct{}
 
-func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) {
+func SendAmazonCollyRequest(productURL string, scraper interfaces.Scraper, collector interfaces.Collectors) (*scraping.AmazonProduct, error) {
 	// Clear the Object
 	amazonData = &scraping.AmazonProduct{}
-
-	// Create Object interface
-	scraper := interfaces.Scraper{
-		AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN},
-	}
-
-	// Create Collector
-	collector := scraper.InitCollector()
 
 	// Callbacks
 	collector.OnError(scraper.OnError)

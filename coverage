@@ -1,15 +1,4 @@
 mode: set
-webScraper/src/utils/request.utils.go:12.53,15.16 2 1
-webScraper/src/utils/request.utils.go:15.16,18.3 2 1
-webScraper/src/utils/request.utils.go:21.2,23.16 3 1
-webScraper/src/utils/request.utils.go:23.16,26.3 2 1
-webScraper/src/utils/request.utils.go:27.2,27.32 1 1
-webScraper/src/utils/request.utils.go:30.51,32.16 2 1
-webScraper/src/utils/request.utils.go:32.16,35.3 2 1
-webScraper/src/utils/request.utils.go:36.2,38.16 3 1
-webScraper/src/utils/request.utils.go:38.16,41.3 2 1
-webScraper/src/utils/request.utils.go:42.2,42.18 1 1
-webScraper/src/utils/test.utils.go:7.46,9.2 1 1
 webScraper/src/services/emails/sendEmail.service.go:18.94,28.16 7 1
 webScraper/src/services/emails/sendEmail.service.go:28.16,31.3 2 1
 webScraper/src/services/emails/sendEmail.service.go:32.2,32.12 1 1
@@ -22,3 +11,14 @@ webScraper/src/services/emails/sendEmail.service.go:66.16,69.3 2 0
 webScraper/src/services/emails/sendEmail.service.go:72.2,73.16 2 1
 webScraper/src/services/emails/sendEmail.service.go:73.16,76.3 2 1
 webScraper/src/services/emails/sendEmail.service.go:77.2,77.12 1 1
+webScraper/src/utils/request.utils.go:12.53,15.16 2 1
+webScraper/src/utils/request.utils.go:15.16,18.3 2 1
+webScraper/src/utils/request.utils.go:21.2,23.16 3 1
+webScraper/src/utils/request.utils.go:23.16,26.3 2 1
+webScraper/src/utils/request.utils.go:27.2,27.32 1 1
+webScraper/src/utils/request.utils.go:30.51,32.16 2 1
+webScraper/src/utils/request.utils.go:32.16,35.3 2 1
+webScraper/src/utils/request.utils.go:36.2,38.16 3 1
+webScraper/src/utils/request.utils.go:38.16,41.3 2 1
+webScraper/src/utils/request.utils.go:42.2,42.18 1 1
+webScraper/src/utils/test.utils.go:7.46,9.2 1 1
