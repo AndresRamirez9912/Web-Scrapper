@@ -13,17 +13,9 @@ import (
 
 var amazonData = &scraping.AmazonProduct{}
 
-func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) {
+func SendAmazonCollyRequest(productURL string, scraper interfaces.Scraper, collector interfaces.Collectors) (*scraping.AmazonProduct, error) {
 	// Clear the Object
 	amazonData = &scraping.AmazonProduct{}
-
-	// Create Object interface
-	scraper := interfaces.Scraper{
-		AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN},
-	}
-
-	// Create Collector
-	collector := scraper.InitCollector()
 
 	// Callbacks
 	collector.OnError(scraper.OnError)
@@ -38,15 +30,10 @@ func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) 
 	err := collector.Visit(productURL)
 	if err != nil {
 		log.Println("Error Visiting the page ", err)
+		return nil, err
 	}
 
 	collector.Wait()
-
-	data, err := handleResponse()
-	if err != nil {
-		log.Println("Error getting data from scraping")
-		return nil, err
-	}
 
 	// Get the Product Id from the URL
 	productId, err := getProductId(productURL)
@@ -55,9 +42,9 @@ func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) 
 		return nil, err
 	}
 
-	data.Id = productId
-	data.ProductURL = productURL
-	return data, nil
+	amazonData.Id = productId
+	amazonData.ProductURL = productURL
+	return amazonData, nil
 }
 
 func amazonOnHTML(h *colly.HTMLElement) {
@@ -102,10 +89,6 @@ func amazonOnHTML(h *colly.HTMLElement) {
 		amazonData.Disccount = prices[2]
 	}
 
-}
-
-func handleResponse() (*scraping.AmazonProduct, error) {
-	return amazonData, nil
 }
 
 func getProductId(productURL string) (string, error) {
