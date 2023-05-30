@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Add CSS Code -->
+    <style>
+        .flexContainer {
+            width: 700px;
+            display: flex;
+            background: #FDEFB2;
+            margin: 50px;
+        }
+
+        .productDescription {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .imageContainer {
+            flex-shrink: 0; /* Evita que la imagen se reduzca */
+            margin: 10px;   /* Ajusta el margen según tus necesidades */
+        }
+
+        .priceContainer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .price {
+            margin: 10px;
+        }
+
+        .shaded {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Title -->
+    <h1>
+        Lower Price Alert
+    </h1>
+
+    <!-- Little email description-->
+    <div>Hemos detectado que el producto {{.Name}} que
+         le estas haciendo seguimiento ha bajado de precio.
+         Antes costaba {{.High_price}}, pero ahora cuesta {{.Current_price}}. ¡Aprovecha el descuento!.</div>
+
+    <br>
+
+    <div>
+        El link del producto lo tienes aca mismo <a
+            href={{.ProductURL}}>{{.ProductURL}}</a>
+    </div>
+
+    <!-- Summary Table  -->
+    <div class="flexContainer">
+        <div class="imageContainer">
+            <a href={{.ProductURL}}><img src={{.ImageURL}} width="200" height="200"></a>
+        </div>
+
+        <div class="productDescription">
+            <h2>{{.Name}}</h2>
+            <br>
+            <div>{{.Description}}</div>
+            <br>
+            <div class="priceContainer">
+                <div class="price shaded"> Antes: {{.High_price}}</div>
+                <div class="price">Despues: {{.Current_price}}</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
