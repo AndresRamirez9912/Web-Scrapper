@@ -2,6 +2,7 @@ package constants
 
 const MY_EMAIL = "MY_EMAIL"
 const ACCOUNT_VERIFICATION_SUBJECT = "Verificacion de correo electronico Tracking de precios"
+const LOWER_NOTIFICATION_SUBJECT = "Notificacion de precio bajo"
 const SMTP_HOST = "smtp.gmail.com"
 const FROM_HEADER = "From"
 const TO_HEADER = "To"

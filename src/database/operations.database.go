@@ -5,12 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"webScraper/src/constants"
+	"webScraper/src/interfaces"
+	"webScraper/src/models/auth"
 	"webScraper/src/models/scraping"
+	services "webScraper/src/services/emails"
 
 	"github.com/google/uuid"
+	"gopkg.in/gomail.v2"
 )
 
 func TrackProduct(product scraping.Product, userId string) error {
+	// TODO: Reduce this function using sub functions
 	// Open the connection now to the scraping DB
 	connection, err := CreateConnectionToDatabase("webscraping")
 	if err != nil {
@@ -33,7 +40,7 @@ func TrackProduct(product scraping.Product, userId string) error {
 		log.Println("The product already exists")
 
 		// Check if the price change
-		priceChange, err := checkPriceChanges(connection, product)
+		priceChange, savedPrice, err := checkPriceChanges(connection, product)
 		if err != nil {
 			return errors.New("Error checking the price")
 		}
@@ -52,6 +59,29 @@ func TrackProduct(product scraping.Product, userId string) error {
 				return err
 			}
 
+			// Send an email if the new price is lower
+			if savedPrice > product.Current_price {
+				user, err := GetUserById(userId)
+				if err != nil {
+					log.Println("Error getting the user")
+					return err
+				}
+				sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
+				alertProduct := &scraping.Product{
+					Product_id:    product.Product_id,
+					ImageURL:      product.ImageURL,
+					Name:          product.Name,
+					Description:   product.Description,
+					ProductURL:    product.ProductURL,
+					Current_price: product.Current_price,
+					High_price:    savedPrice, // The older and lower price
+				}
+				err = services.SendNotificationLowerPrice(user, sender, *alertProduct)
+				if err != nil {
+					log.Println("Error sending lower price email")
+					return err
+				}
+			}
 		}
 		return nil
 	}
@@ -80,6 +110,16 @@ func TrackProduct(product scraping.Product, userId string) error {
 		return err
 	}
 
+	return nil
+}
+
+func CreateProduct(product interfaces.Product, userId string) error {
+	newProduct := product.CreateProductStructure(userId)
+	err := TrackProduct(newProduct, userId)
+	if err != nil {
+		log.Println("Error creating the Amazon product")
+		return err
+	}
 	return nil
 }
 
@@ -186,13 +226,13 @@ func createPriceHistoryField(connection *sql.DB, product scraping.Product) error
 	return nil
 }
 
-func checkPriceChanges(connection *sql.DB, product scraping.Product) (bool, error) {
+func checkPriceChanges(connection *sql.DB, product scraping.Product) (bool, string, error) {
 	// Get the Price from the DB
 	sqlSentence := fmt.Sprintf("SELECT * FROM price WHERE product_id = '%s'", product.Product_id)
 	response, err := connection.Query(sqlSentence)
 	if err != nil {
 		log.Println("Error making the query for getting the price ", err)
-		return false, err
+		return false, "", err
 	}
 
 	// Extract the name of the product if it exits
@@ -201,19 +241,19 @@ func checkPriceChanges(connection *sql.DB, product scraping.Product) (bool, erro
 		err = response.Scan(&price_field[0], &price_field[1], &price_field[2], &price_field[3], &price_field[4])
 		if err != nil {
 			log.Println("Error getting the stored prices", err)
-			return false, err
+			return false, "", err
 		}
 	}
 
 	// Check if the current price is equal to the previously price
 	if price_field[2] == product.Current_price {
 		log.Println("The price is equal")
-		return false, nil
+		return false, price_field[2], nil
 	}
 
 	log.Println("The price has changed")
 	defer response.Close()
-	return true, nil
+	return true, price_field[2], nil
 }
 
 func updatePrice(connection *sql.DB, product scraping.Product) error {
@@ -399,4 +439,47 @@ func GetAllProducts() ([]string, error) {
 	}
 
 	return products, nil
+}
+
+func GetUserById(userId string) (*auth.User, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error getting the user, DB can't connect")
+		return nil, err
+	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(connection)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
+
+	// Get the user
+	sqlSentence := fmt.Sprintf("SELECT user_id,name,email FROM users WHERE user_id = '%s'", userId)
+	response, err := connection.Query(sqlSentence)
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return nil, err
+	}
+
+	user := &auth.User{}
+	for response.Next() {
+		err = response.Scan(&user.Id, &user.Name, &user.Email)
+		if err != nil {
+			log.Println("Error getting the user", err)
+			return nil, err
+		}
+	}
+
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the response with the DB")
+		return nil, err
+	}
+
+	return user, nil
 }

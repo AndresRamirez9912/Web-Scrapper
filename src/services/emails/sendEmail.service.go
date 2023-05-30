@@ -11,6 +11,7 @@ import (
 	"webScraper/src/constants"
 	"webScraper/src/interfaces"
 	"webScraper/src/models/auth"
+	"webScraper/src/models/scraping"
 
 	"gopkg.in/gomail.v2"
 )
@@ -77,11 +78,11 @@ func SendVerificationEmail(user *auth.User, sender interfaces.Senders) error {
 	return nil
 }
 
-func SendNotificationLowerPrice(user *auth.User, sender interfaces.Senders, product *interfaces.Product) error {
+func SendNotificationLowerPrice(user *auth.User, sender interfaces.Senders, product scraping.Product) error {
 	var body bytes.Buffer
 
 	// Get the Template
-	template, err := template.ParseFiles(constants.LOWER_PRICE_TEMPLATE_ADDRESS)
+	template, err := template.ParseFiles("src/services/emails/templates/lowerPriceNotification.template.html")
 	if err != nil {
 		log.Println("Error Trying to get the template ", err)
 		return err
@@ -95,10 +96,11 @@ func SendNotificationLowerPrice(user *auth.User, sender interfaces.Senders, prod
 	}
 
 	// Send the email
-	err = sendEmail(user.Email, constants.ACCOUNT_VERIFICATION_SUBJECT, body.String(), sender)
+	err = sendEmail(user.Email, constants.LOWER_NOTIFICATION_SUBJECT, body.String(), sender)
 	if err != nil {
 		log.Println("Error Sending the email", err)
 		return err
 	}
+	log.Println("Lower Price alert sent")
 	return nil
 }
