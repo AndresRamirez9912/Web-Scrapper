@@ -39,6 +39,20 @@ func TrackProduct(product scraping.Product, userId string) error {
 	if exists == nil {
 		log.Println("The product already exists")
 
+		// Check if the user has tracked the product
+		isTracked, err := checkIfProductIsTrackedByUser(product.Product_id, userId)
+		if err != nil {
+			return err
+		}
+
+		if !isTracked {
+			// Add the tracking to the account
+			err = createUserProductField(connection, product, userId)
+			if err != nil {
+				return err
+			}
+		}
+
 		// Check if the price change
 		priceChange, savedPrice, err := checkPriceChanges(connection, product)
 		if err != nil {
@@ -59,13 +73,15 @@ func TrackProduct(product scraping.Product, userId string) error {
 				return err
 			}
 
-			// Send an email if the new price is lower
+			// Send an email if the new price is lower to the users
 			if savedPrice > product.Current_price {
-				user, err := GetUserById(userId)
+				// Get the UserId of the clients that are tracking the prodcut
+				users, err := GetUserIdByProductId(product.Product_id)
 				if err != nil {
-					log.Println("Error getting the user")
 					return err
 				}
+
+				// Prepare the data to send
 				sender := gomail.NewDialer(constants.SMTP_HOST, 587, os.Getenv(constants.MY_EMAIL), os.Getenv(constants.EMAIL_PASSWORD))
 				alertProduct := &scraping.Product{
 					Product_id:    product.Product_id,
@@ -76,10 +92,20 @@ func TrackProduct(product scraping.Product, userId string) error {
 					Current_price: product.Current_price,
 					High_price:    savedPrice, // The older and lower price
 				}
-				err = services.SendNotificationLowerPrice(user, sender, *alertProduct)
-				if err != nil {
-					log.Println("Error sending lower price email")
-					return err
+
+				// Send the email
+				for _, user := range users {
+					user, err := GetUserById(user)
+					if err != nil {
+						log.Println("Error getting the user")
+						return err
+					}
+
+					err = services.SendNotificationLowerPrice(user, sender, *alertProduct)
+					if err != nil {
+						log.Println("Error sending lower price email")
+						return err
+					}
 				}
 			}
 		}
@@ -482,4 +508,98 @@ func GetUserById(userId string) (*auth.User, error) {
 	}
 
 	return user, nil
+}
+
+func GetUserIdByProductId(productId string) ([]string, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error getting the user, DB can't connect")
+		return nil, err
+	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(connection)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
+
+	// Get the user
+	sqlSentence := fmt.Sprintf("SELECT user_id FROM user_product WHERE product_id = '%s'", productId)
+	response, err := connection.Query(sqlSentence)
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return nil, err
+	}
+
+	var users []string
+	var userId string
+	for response.Next() {
+		err = response.Scan(&userId)
+		if err != nil {
+			log.Println("Error getting the user", err)
+			return nil, err
+		}
+		users = append(users, userId)
+	}
+
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the response with the DB")
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func checkIfProductIsTrackedByUser(productId string, userId string) (bool, error) {
+	// Create connection to the DB
+	connection, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error getting the user, DB can't connect")
+		return true, err
+	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(connection)
+		if err != nil {
+			log.Println("Error closing in users ", err)
+			return
+		}
+	}()
+
+	// Get the user
+	sqlSentence := fmt.Sprintf("SELECT user_product_id FROM user_product WHERE user_id = '%s' AND product_id = '%s'", userId, productId)
+	response, err := connection.Query(sqlSentence)
+	if err != nil {
+		log.Println("Error making the query for getting the price ", err)
+		return true, err
+	}
+
+	var result string
+	for response.Next() {
+		err = response.Scan(&result)
+		if err != nil {
+			log.Println("Error getting the user", err)
+			return true, err
+		}
+	}
+
+	if result == " " {
+		log.Println("Product assigned to the client account")
+		return false, nil
+	}
+
+	err = response.Close()
+	if err != nil {
+		log.Println("Error closing the response with the DB")
+		return true, err
+	}
+
+	return true, nil
+
 }
