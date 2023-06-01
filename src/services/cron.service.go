@@ -42,7 +42,7 @@ func CheckProducts() {
 			}
 
 			// Create the product and store in DB
-			err = interfaces.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(scrapedProduct, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}
@@ -58,7 +58,7 @@ func CheckProducts() {
 			}
 
 			// Create the product and store in DB
-			err = interfaces.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(scrapedProduct, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}
@@ -74,7 +74,7 @@ func CheckProducts() {
 			}
 
 			// Create the product and store in DB
-			err = interfaces.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(scrapedProduct, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}
