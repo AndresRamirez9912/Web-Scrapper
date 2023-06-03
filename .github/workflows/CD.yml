@@ -1,0 +1,35 @@
+name: Price Tracking CD
+on:
+  release:
+    types:
+      - created
+      - edited
+
+jobs:
+  Build_and_Bocket:
+    name: Build project
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v3
+
+      - name: Build project
+        run: go build main.go
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::764539909266:role/github-action-price-tracking-role
+          aws-region: us-east-1
+
+      - name: Deploy using CodeDeploy
+        id: deploy
+        run: |
+          aws deploy create-deployment \
+            --application-name Price-Tracker \
+            --deployment-group-name Deploy-Group \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
