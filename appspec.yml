@@ -1,5 +1,11 @@
 version: 0.0
 os: linux
+
+environment:
+  variables:
+    EMAIL_PASSWORD: ""
+    MY_EMAIL: ""
+
 files:
   - source: / # I need to deploy all files 
     destination: /home/ec2-user/app #store my deploy on this path in the EC2
