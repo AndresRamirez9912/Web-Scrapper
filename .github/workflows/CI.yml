@@ -1,4 +1,4 @@
-name: golang-ci-pipeline
+name: Price Tracking CI
 on:
   push:
     branches:
