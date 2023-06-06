@@ -1,17 +1,31 @@
 version: 0.0
 os: linux
+
+environment:
+  variables:
+    EMAIL_PASSWORD: ""
+    MY_EMAIL: ""
+
 files:
-  - source: .
-    destination: /home/ec2-user/app
+  - source: / # I need to deploy all files 
+    destination: /home/ec2-user/app #store my deploy on this path in the EC2
   hooks:
     BeforeInstall:
     - location: scripts/install_dependencies
       timeout: 300
-      runas: root
+      runas: root   
+  
+    ApplicationStart:
     - location: scripts/start_server
       timeout: 300
       runas: root
-  ApplicationStop:
+
+    ValidateService:
+    - location: scripts/validate_service
+      timeout: 300
+      runas: root
+
+    ApplicationStop:
     - location: scripts/stop_server
       timeout: 300
       runas: root

@@ -37,7 +37,7 @@ func SendVerificationEmail(user *auth.User, sender interfaces.Senders) error {
 	var body bytes.Buffer
 
 	// Get the Template with the values
-	template, err := template.ParseFiles(constants.VERIFICATION_TEMPLATE_ADDRESS)
+	template, err := getTemplate(constants.VERIFICATION_TEMPLATE_ABSOLUTE_ADDRESS, constants.VERIFICATION_TEMPLATE_RELATIVE_ADDRESS)
 	if err != nil {
 		log.Println("Error Trying to get the template ", err)
 		return err
@@ -82,7 +82,7 @@ func SendNotificationLowerPrice(user *auth.User, sender interfaces.Senders, prod
 	var body bytes.Buffer
 
 	// Get the Template
-	template, err := template.ParseFiles("src/services/emails/templates/lowerPriceNotification.template.html")
+	template, err := getTemplate(constants.LOWER_PRICE_TEMPLATE_ABSOLUTE_ADDRESS, constants.LOWER_PRICE_TEMPLATE_RELATIVE_ADDRESS)
 	if err != nil {
 		log.Println("Error Trying to get the template ", err)
 		return err
@@ -103,4 +103,15 @@ func SendNotificationLowerPrice(user *auth.User, sender interfaces.Senders, prod
 	}
 	log.Println("Lower Price alert sent")
 	return nil
+}
+
+func getTemplate(relativeURL string, absoluteURL string) (*template.Template, error) {
+	_, err := os.Stat("go.mod") // Check if this file exists
+	// I'm in the root position
+	if err != nil {
+		return template.ParseFiles(absoluteURL)
+
+	}
+	// I'm in the services position
+	return template.ParseFiles(relativeURL)
 }
