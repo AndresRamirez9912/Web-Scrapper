@@ -5,10 +5,10 @@ cd /home/ubuntu/price-tracking/Web-Scrapper/
 
 # Remove the previously files
 rm app
-sudo rm nohup.out
+rm nohup.out
 
 # Build the applicatiojn
 go build -o ./app
 
 # Start the server in the background
-nohup ./app &!
+nohup ./app &
