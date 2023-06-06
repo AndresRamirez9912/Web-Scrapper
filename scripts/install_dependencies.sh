@@ -1,17 +1,28 @@
 #!/bin/bash
-apt-get update
+
+# Install dependencies
+sudo apt-get update
+sudo apt install jq
+
+# Go to the application path
+cd price-tracking/Web-Scrapper/
+
+# Install Golang pacakages 
 go mod tidy
-rm app #remove the built app 
-chmod +x "$0" # Give permissions to this script 
+
+#remove a built app 
+rm app
 
 # Create the env variables from S3
 aws s3 cp s3://price-tracker-env/env.json /tmp/env_vars.json
 
 # Read the contents of the JSON file and set environment variables
-password=$(jq -r '.EMAIL_PASSWORD' /tmp/env_vars.json) # Replace '.yourKey' with the appropriate JSON key path
-my_email=$(jq -r '.MY_EMAIL' /tmp/env_vars.json) # Replace '.yourKey' with the appropriate JSON key path
-export MY_EMAIL='$password'
-export EMAIL_PASSWORD='$my_email'
+EMAIL_PASSWORD=$(jq -r '.EMAIL_PASSWORD' /tmp/env_vars.json)
+MY_EMAIL=$(jq -r '.MY_EMAIL' /tmp/env_vars.json) 
+
+#Create the env variables
+export EMAIL_PASSWORD 
+export MY_EMAIL
 
 # Delete the temporary file
-rm /tmp/env_vars.txt
+rm /tmp/env_vars.json
