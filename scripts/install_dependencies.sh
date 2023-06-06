@@ -14,7 +14,7 @@ sudo apt-get update
 sudo apt install jq
 
 # Go to the application path
-cd home/ubuntu/price-tracking/Web-Scrapper/
+cd /home/ubuntu/price-tracking/Web-Scrapper/
 
 # Install Golang pacakages 
 go mod tidy
