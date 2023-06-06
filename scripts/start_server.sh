@@ -8,4 +8,4 @@ sudo rm nohup.out
 go build -o ./app
 
 # Start the server in the background
-nohup ./app &
+nohup ./app &!

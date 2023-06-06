@@ -1,15 +1,6 @@
 #!/bin/bash
 
 # Install dependencies
-rm go1.20.5.linux-amd64.tar.gz
-curl -O https://storage.googleapis.com/golang/go1.20.5.linux-amd64.tar.gz #Download the latest version 
-tar -xvf go1.20.5.linux-amd64.tar.gz # Extract the tar
-sudo mv go /usr/local
-echo "export GOPATH=$HOME/work" >> ~/.profile 
-echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> ~/.profile
-source ~/.profile
-go version
-
 sudo apt-get update
 sudo apt install jq
 
