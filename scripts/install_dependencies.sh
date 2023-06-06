@@ -24,5 +24,12 @@ MY_EMAIL=$(jq -r '.MY_EMAIL' /tmp/env_vars.json)
 export EMAIL_PASSWORD 
 export MY_EMAIL
 
+# Create .env file 
+sudo touch .env
+
+# Write the env variables on the .env file
+sudo sh -c 'echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> .env'
+sudo sh -c 'echo "MY_EMAIL=$MY_EMAIL" >> .env'
+
 # Delete the temporary file
 rm /tmp/env_vars.json
