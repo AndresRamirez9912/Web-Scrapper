@@ -1,31 +1,26 @@
 version: 0.0
 os: linux
 
-environment:
-  variables:
-    EMAIL_PASSWORD: ""
-    MY_EMAIL: ""
-
 files:
-  - source: / # I need to deploy all files 
-    destination: /home/ec2-user/app #store my deploy on this path in the EC2
-  hooks:
-    BeforeInstall:
-    - location: scripts/install_dependencies
-      timeout: 300
-      runas: root   
-  
-    ApplicationStart:
-    - location: scripts/start_server
+  - source: / # I need to deploy all files
+    destination: /home/ubuntu/price-tracking/Web-Scrapper #store my deploy on this path in the EC2
+hooks:
+  BeforeInstall:
+    - location: ./scripts/install_dependencies
       timeout: 300
       runas: root
 
-    ValidateService:
-    - location: scripts/validate_service
+  ApplicationStart:
+    - location: ./scripts/start_server
       timeout: 300
       runas: root
 
-    ApplicationStop:
-    - location: scripts/stop_server
+  ValidateService:
+    - location: ./scripts/validate_service
+      timeout: 300
+      runas: root
+
+  ApplicationStop:
+    - location: ./scripts/stop_server
       timeout: 300
       runas: root
