@@ -1,17 +1,23 @@
 #!/bin/bash
 
 # Install dependencies
+rm go1.20.5.linux-amd64.tar.gz
+curl -O https://storage.googleapis.com/golang/go1.20.5.linux-amd64.tar.gz #Download the latest version 
+tar -xvf go1.20.5.linux-amd64.tar.gz # Extract the tar
+sudo mv go /usr/local
+echo "export GOPATH=$HOME/work" >> ~/.profile 
+echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> ~/.profile
+source ~/.profile
+go version
+
 sudo apt-get update
 sudo apt install jq
 
 # Go to the application path
-cd price-tracking/Web-Scrapper/
+cd home/ubuntu/price-tracking/Web-Scrapper/
 
 # Install Golang pacakages 
 go mod tidy
-
-#remove a built app 
-rm app
 
 # Create the env variables from S3
 aws s3 cp s3://price-tracker-env/env.json /tmp/env_vars.json
