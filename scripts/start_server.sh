@@ -10,4 +10,4 @@ echo "File exists"
 
 # Start the server in the background
 /home/ubuntu/price-tracking/Web-Scrapper/app &
-
+exit 0

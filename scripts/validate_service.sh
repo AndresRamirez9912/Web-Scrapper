@@ -7,3 +7,4 @@ if ! nc -z localhost 3000; then
 fi
 
 echo "Server running successfully"
+exit 0
