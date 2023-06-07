@@ -4,9 +4,7 @@
 PID=$(lsof -t -i :3000)
 
 # Check if the server process is running
-if [ -z "$PID" ]; then
-  echo "Server is not running."
-else
+if ! [ -z "$PID" ]; then
   # Stop the server gracefully by sending a termination signal
   sudo kill "$PID"
   echo "Server stopped successfully."

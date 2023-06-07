@@ -6,10 +6,5 @@ if ! [ -f /home/ubuntu/price-tracking/Web-Scrapper/app ]; then
     exit 1
 fi
 
-echo "File exists"
-
 # Start the server in the background
 /home/ubuntu/price-tracking/Web-Scrapper/app &
-
-# Close this script
-exit 0
