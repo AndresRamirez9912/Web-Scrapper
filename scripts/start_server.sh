@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if the binary file exists
-if ![ -f /home/ubuntu/price-tracking/Web-Scrapper/app ]; then
+if ! [ -f /home/ubuntu/price-tracking/Web-Scrapper/app ]; then
     echo "File does not exist"
     exit 1
 fi
