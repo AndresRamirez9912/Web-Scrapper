@@ -7,7 +7,8 @@ cd /home/ubuntu/price-tracking/Web-Scrapper/
 rm app
 
 # Build the applicatiojn
-go build -o ./app
+go build -o /home/ubuntu/price-tracking/Web-Scrapper/app
+sleep 10 # Delay meanwhile the built is created
 if [ -f ./app ]; then
     echo "File exists"
 else
