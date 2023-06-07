@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +23,7 @@ func main() {
 	defer logFile.Close()
 
 	// Set the location of the logs (my file and the default Stdout)
-	log.SetOutput(io.MultiWriter(logFile, os.Stdout))
+	log.SetOutput(logFile)
 
 	// Load .env Variables
 	err = godotenv.Load(".env")
