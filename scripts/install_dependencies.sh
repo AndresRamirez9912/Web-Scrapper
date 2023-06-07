@@ -45,6 +45,7 @@ cd /home/ubuntu/price-tracking/Web-Scrapper/
 
 # Remove the previously files
 rm app
+rm nohup.out
 
 # Build the applicatiojn
 go build -o /home/ubuntu/price-tracking/Web-Scrapper/app > /home/ubuntu/price-tracking/priceTracking.log 
