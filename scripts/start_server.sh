@@ -9,7 +9,7 @@ rm app
 # Build the applicatiojn
 go build -o /home/ubuntu/price-tracking/Web-Scrapper/app
 sleep 10 # Delay meanwhile the built is created
-if [ -f ./app ]; then
+if [ -f /home/ubuntu/price-tracking/Web-Scrapper/app ]; then
     echo "File exists"
 else
     echo "File does not exist"
@@ -17,4 +17,4 @@ else
 fi
 
 # Start the server in the background
-./app &
+/home/ubuntu/price-tracking/Web-Scrapper/app &
