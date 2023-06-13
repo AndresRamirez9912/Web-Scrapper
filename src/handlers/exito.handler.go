@@ -18,24 +18,33 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	URL, err := utils.GetProductURL(r)
 	if err != nil {
 		log.Println("Error Getting the URL of the Product ", err)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	// Make the Scraping to the page
 	scrapedProduct, err := scrapers.SendExitoCollyRequest(URL)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	// Send the response
 	dataResponse, err := json.Marshal(scrapedProduct)
 	if err != nil {
 		log.Println("Error Serializing the obtained data ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	// Create the product and store in DB
 	err = database.CreateProduct(scrapedProduct, userId)
 	if err != nil {
-		log.Println("Error creating the Amazon product")
+		log.Println("Error creating the Exito product")
+		w.WriteHeader(http.StatusInternalServerError)
+		database.DeleteProduct(scrapedProduct)
+		return
 	}
 
 	w.Header().Set(constants.CONTENT_TYPE, constants.APPLICATION_JSON)
@@ -43,6 +52,8 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(dataResponse) // Send body
 	if err != nil {
 		log.Println("Error sending the response ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		database.DeleteProduct(scrapedProduct)
 		return
 	}
 

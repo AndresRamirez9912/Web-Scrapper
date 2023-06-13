@@ -19,6 +19,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	URL, err := utils.GetProductURL(r)
 	if err != nil {
 		log.Println("Error Getting the URL of the Product ", err)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -33,6 +34,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	scrapedProduct, err := scrapers.SendAmazonCollyRequest(URL, scraper, collector)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -47,6 +49,8 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	err = database.CreateProduct(scrapedProduct, userId)
 	if err != nil {
 		log.Println("Error creating the Amazon product")
+		w.WriteHeader(http.StatusInternalServerError)
+		database.DeleteProduct(scrapedProduct)
 		return
 	}
 
@@ -55,6 +59,8 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(dataResponse) // Send body
 	if err != nil {
 		log.Println("Error sending the response")
+		w.WriteHeader(http.StatusInternalServerError)
+		database.DeleteProduct(scrapedProduct)
 		return
 	}
 
