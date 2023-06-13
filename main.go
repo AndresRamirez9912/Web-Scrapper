@@ -1,8 +1,10 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"webScraper/src/database"
 	"webScraper/src/handlers"
 	"webScraper/src/middleware"
@@ -14,8 +16,19 @@ import (
 )
 
 func main() {
+	// Create the file to store my logs
+	logFile, err := os.OpenFile("./../priceTracking.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Println("Error creating the log file")
+	}
+	defer logFile.Close()
+
+	// Set the location of the logs (my file and the default Stdout)
+	log.SetOutput(io.MultiWriter(logFile, os.Stdout))
+	log.SetOutput(logFile)
+
 	// Load .env Variables
-	err := godotenv.Load(".env")
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Println("Error loading .env File")
 	}
