@@ -6,3 +6,4 @@ cache/**
 
 # Built application
 app
+nohup.out
