@@ -147,3 +147,28 @@ func UpdateCookie(userEmail string, newCookie string) error {
 
 	return nil
 }
+
+func DeleteUser(user *auth.User) {
+	// Create connection to the DB
+	db, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error deleting the user, DB can't connect")
+	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing the connection in users ", err)
+			return
+		}
+	}()
+
+	// Execute the SQL sentence
+	sqlSentence := fmt.Sprintf("DELETE FROM users WHERE user_id = '%s'", user.Id)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error deleting the user ", err)
+	}
+	log.Printf("User %s deleted\n", user.Name)
+}

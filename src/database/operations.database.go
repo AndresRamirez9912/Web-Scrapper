@@ -149,6 +149,61 @@ func CreateProduct(product interfaces.Product, userId string) error {
 	return nil
 }
 
+func DeleteProduct(product interfaces.Product) {
+	// Create the product structure
+	generalProduct := product.CreateProductStructure("")
+
+	// Create connection to the DB
+	db, err := CreateConnectionToDatabase("webscraping")
+	if err != nil {
+		log.Println("Error deleting the product, DB can't connect")
+		return
+	}
+
+	// Close the connection
+	defer func() {
+		err = CloseConnection(db)
+		if err != nil {
+			log.Println("Error closing the connection in products ", err)
+			return
+		}
+	}()
+
+	// Delete the element from the price_history table
+	sqlSentence := fmt.Sprintf("DELETE FROM price_history WHERE product_id = '%s'", generalProduct.Product_id)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error deleting the product in price_history table ", err)
+		return
+	}
+
+	// Delete the element from the price table
+	sqlSentence = fmt.Sprintf("DELETE FROM price WHERE product_id = '%s'", generalProduct.Product_id)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error deleting the product in price table ", err)
+		return
+	}
+
+	// Delete the element from the user_product table
+	sqlSentence = fmt.Sprintf("DELETE FROM user_product WHERE product_id = '%s'", generalProduct.Product_id)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error deleting the product in price table ", err)
+		return
+	}
+
+	// Delete the element from the product table
+	sqlSentence = fmt.Sprintf("DELETE FROM product WHERE product_id = '%s'", generalProduct.Product_id)
+	_, err = db.Exec(sqlSentence)
+	if err != nil {
+		log.Println("Error deleting the product from the product table ", err)
+		return
+	}
+
+	log.Printf("Product %s deleted\n", generalProduct.Product_id)
+}
+
 func checkIfProductExists(connection *sql.DB, product_id string) error {
 	// Execute the SQL sentence
 	sqlSentence := fmt.Sprintf("SELECT product_id FROM product WHERE product_id = '%s'", product_id)

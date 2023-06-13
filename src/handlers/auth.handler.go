@@ -43,6 +43,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error sending the email verification")
 		w.WriteHeader(http.StatusInternalServerError)
+		database.DeleteUser(user)
 		return
 	}
 
