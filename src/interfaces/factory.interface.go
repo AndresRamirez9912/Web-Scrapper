@@ -9,13 +9,21 @@ import (
 	"github.com/gocolly/colly/extensions"
 )
 
+// This is the super interface that every object will implement
+type Collectors interface {
+	OnError(colly.ErrorCallback)
+	OnRequest(colly.RequestCallback)
+	OnResponse(colly.ResponseCallback)
+	OnHTML(string, colly.HTMLCallback)
+}
+
 type Scraper struct {
 	AllowedDomains []string
 }
 
 func (s Scraper) InitCollector() *colly.Collector {
 	collector := colly.NewCollector(
-		colly.AllowedDomains(s.AllowedDomains...),
+		colly.AllowedDomains(s.AllowedDomains...), // Insert the domains
 		colly.CacheDir(constants.CACHE),
 	)
 	collector.SetRequestTimeout(90 * time.Second)
@@ -41,4 +49,8 @@ func (s Scraper) OnResponse(r *colly.Response) {
 
 func (s Scraper) OnError(r *colly.Response, err error) {
 	log.Println("Error making the scraping: ", err)
+}
+
+func (s Scraper) OnHTML(string, colly.HTMLCallback) {
+	log.Println("Error making the scraping: ")
 }

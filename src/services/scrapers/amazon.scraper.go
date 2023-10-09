@@ -13,16 +13,23 @@ import (
 
 var amazonData = &scraping.AmazonProduct{}
 
-func SendAmazonCollyRequest(productURL string, scraper interfaces.Scraper, collector interfaces.Collectors) (*scraping.AmazonProduct, error) {
+func SendAmazonCollyRequest(productURL string) (*scraping.AmazonProduct, error) {
 	// Clear the Object
 	amazonData = &scraping.AmazonProduct{}
 
+	// Create a amazonCollector to setup the data searcher
+	amazonScraper := interfaces.Scraper{
+		AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN},
+	}
+
+	collector := amazonScraper.InitCollector()
+
 	// Callbacks
-	collector.OnError(scraper.OnError)
+	collector.OnError(amazonScraper.OnError)
 
-	collector.OnRequest(scraper.OnRequest)
+	collector.OnRequest(amazonScraper.OnRequest)
 
-	collector.OnResponse(scraper.OnResponse)
+	collector.OnResponse(amazonScraper.OnResponse)
 
 	collector.OnHTML(constants.AMAZON_QUERY_SELECTOR, amazonOnHTML)
 
@@ -44,6 +51,7 @@ func SendAmazonCollyRequest(productURL string, scraper interfaces.Scraper, colle
 
 	amazonData.Id = productId
 	amazonData.ProductURL = productURL
+
 	return amazonData, nil
 }
 
