@@ -139,7 +139,7 @@ func TrackProduct(product scraping.Product, userId string) error {
 	return nil
 }
 
-func CreateProduct(product interfaces.Product, userId string) error {
+func CreateProduct(product interfaces.Collectors, userId string) error {
 	newProduct := product.CreateProductStructure(userId)
 	err := TrackProduct(newProduct, userId)
 	if err != nil {
@@ -149,7 +149,7 @@ func CreateProduct(product interfaces.Product, userId string) error {
 	return nil
 }
 
-func DeleteProduct(product interfaces.Product) {
+func DeleteProduct(product interfaces.Collectors) {
 	// Create the product structure
 	generalProduct := product.CreateProductStructure("")
 
