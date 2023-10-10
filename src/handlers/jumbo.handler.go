@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/database"
-	"webScraper/src/models/scraping"
+	"webScraper/src/interfaces"
 	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
@@ -24,7 +24,7 @@ func GetJumboData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	jumboScraper := &scraping.JumboScraper{}
+	jumboScraper := interfaces.ColectorFactory("jumbo")
 	err = scrapers.ScrapedPage(URL, []string{constants.JUMBO_HALF_DOMAIN, constants.JUMBO_DOMAIN}, jumboScraper)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/database"
-	"webScraper/src/models/scraping"
+	"webScraper/src/interfaces"
 	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
@@ -26,7 +26,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	// Make the Scraping to the page
 
 	// Create Collector
-	amazonScraper := &scraping.AmazonProduct{}
+	amazonScraper := interfaces.ColectorFactory("amazon")
 	err = scrapers.ScrapedPage(URL, []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}, amazonScraper)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)

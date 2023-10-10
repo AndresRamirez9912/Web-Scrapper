@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/database"
-	"webScraper/src/models/scraping"
+	"webScraper/src/interfaces"
 	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
@@ -24,7 +24,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	exitoScraper := &scraping.ExitoScraper{}
+	exitoScraper := interfaces.ColectorFactory("exito")
 	err = scrapers.ScrapedPage(URL, []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}, exitoScraper)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)

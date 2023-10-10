@@ -6,7 +6,7 @@ import (
 	"strings"
 	"webScraper/src/constants"
 	"webScraper/src/database"
-	"webScraper/src/models/scraping"
+	"webScraper/src/interfaces"
 	"webScraper/src/services/scrapers"
 )
 
@@ -31,7 +31,7 @@ func CheckProducts() {
 			// Make the Scraping to the page
 
 			// Create Collector
-			amazonScraper := &scraping.AmazonProduct{}
+			amazonScraper := interfaces.ColectorFactory("amazon")
 			err = scrapers.ScrapedPage(URL.String(), []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}, amazonScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
@@ -48,7 +48,7 @@ func CheckProducts() {
 
 		if strings.Contains(URL.Host, "exito") {
 			// Make the Scraping to the page
-			exitoScraper := &scraping.ExitoScraper{}
+			exitoScraper := interfaces.ColectorFactory("exito")
 			err = scrapers.ScrapedPage(URL.String(), []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}, exitoScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
@@ -65,7 +65,7 @@ func CheckProducts() {
 
 		if strings.Contains(URL.Host, "jumbo") {
 			// Make the Scraping to the page
-			jumboScraper := &scraping.JumboScraper{}
+			jumboScraper := interfaces.ColectorFactory("jumbo")
 			err = scrapers.ScrapedPage(URL.String(), []string{constants.JUMBO_HALF_DOMAIN, constants.JUMBO_DOMAIN}, jumboScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
