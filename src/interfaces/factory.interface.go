@@ -22,11 +22,11 @@ type Collectors interface {
 func ColectorFactory(collectorType string) Collectors {
 	switch collectorType {
 	case "amazon":
-		return &scraping.AmazonProduct{AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}}
+		return &scraping.AmazonColector{AllowedDomains: []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}}
 	case "jumbo":
-		return &scraping.JumboScraper{AllowedDomains: []string{constants.JUMBO_HALF_DOMAIN, constants.JUMBO_DOMAIN}}
+		return &scraping.JumboCollector{AllowedDomains: []string{constants.JUMBO_HALF_DOMAIN, constants.JUMBO_DOMAIN}}
 	case "exito":
-		return &scraping.ExitoScraper{AllowedDomains: []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}}
+		return &scraping.ExitoCollector{AllowedDomains: []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}}
 	}
 	return nil
 }
