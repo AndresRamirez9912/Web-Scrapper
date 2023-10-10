@@ -6,9 +6,9 @@ import (
 	"webScraper/src/utils"
 )
 
-func ScrapedPage(productURL string, allowedDomains []string, scraper interfaces.Collectors) error {
+func ScrapedPage(productURL string, scraper interfaces.Collectors) error {
 	// Create the Colly scraper
-	collector := utils.InitCollector(allowedDomains)
+	collector := utils.InitCollector(scraper.GetDomains())
 
 	// Save URL in my object
 	scraper.SetURL(productURL)

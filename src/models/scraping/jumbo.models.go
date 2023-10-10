@@ -8,15 +8,16 @@ import (
 )
 
 type JumboScraper struct {
-	Id           string
-	Name         string
-	CurrentPrice string
-	Disccount    string
-	HighPrice    string
-	ProductURL   string
-	Brand        string
-	Description  string
-	ImageURL     string
+	Id             string
+	Name           string
+	CurrentPrice   string
+	Disccount      string
+	HighPrice      string
+	ProductURL     string
+	Brand          string
+	Description    string
+	ImageURL       string
+	AllowedDomains []string
 }
 
 // Implement the Collectors Interface
@@ -51,6 +52,10 @@ func (s JumboScraper) GetQuerySelector() string {
 
 func (s *JumboScraper) SetURL(URL string) {
 	s.ProductURL = URL
+}
+
+func (j JumboScraper) GetDomains() []string {
+	return j.AllowedDomains
 }
 
 func (A *JumboScraper) CreateProductStructure(userId string) Product {

@@ -61,6 +61,10 @@ func (s *ExitoScraper) SetURL(URL string) {
 	s.ProductURL = URL
 }
 
+func (s ExitoScraper) GetDomains() []string {
+	return s.AllowedDomains
+}
+
 // Implement the Product interface
 func (E *ExitoScraper) CreateProductStructure(userId string) Product {
 	current := strconv.Itoa(E.Offers.LowPrice)

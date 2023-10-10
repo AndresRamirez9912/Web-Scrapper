@@ -10,15 +10,16 @@ import (
 )
 
 type AmazonProduct struct {
-	Id           string
-	Name         string
-	CurrentPrice string
-	Disccount    string
-	HighPrice    string
-	Brand        string
-	Description  map[int]string
-	ImageURL     string
-	ProductURL   string
+	Id             string
+	Name           string
+	CurrentPrice   string
+	Disccount      string
+	HighPrice      string
+	Brand          string
+	Description    map[int]string
+	ImageURL       string
+	ProductURL     string
+	AllowedDomains []string
 }
 
 // Implement the Collectors Interface
@@ -82,6 +83,10 @@ func (a *AmazonProduct) OnHTML(h *colly.HTMLElement) {
 		a.CurrentPrice = prices[1]
 		a.Disccount = prices[2]
 	}
+}
+
+func (a AmazonProduct) GetDomains() []string {
+	return a.AllowedDomains
 }
 
 // Owner Functions
