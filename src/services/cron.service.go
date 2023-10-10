@@ -4,7 +4,9 @@ import (
 	"log"
 	"net/url"
 	"strings"
+	"webScraper/src/constants"
 	"webScraper/src/database"
+	"webScraper/src/models/scraping"
 	"webScraper/src/services/scrapers"
 )
 
@@ -29,13 +31,14 @@ func CheckProducts() {
 			// Make the Scraping to the page
 
 			// Create Collector
-			scrapedProduct, err := scrapers.SendAmazonCollyRequest(URL.String())
+			amazonScraper := &scraping.AmazonProduct{}
+			err = scrapers.ScrapedPage(URL.String(), []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}, amazonScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
 			}
 
 			// Create the product and store in DB
-			err = database.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(amazonScraper, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}
@@ -45,13 +48,14 @@ func CheckProducts() {
 
 		if strings.Contains(URL.Host, "exito") {
 			// Make the Scraping to the page
-			scrapedProduct, err := scrapers.SendExitoCollyRequest(URL.String())
+			exitoScraper := &scraping.ExitoScraper{}
+			err = scrapers.ScrapedPage(URL.String(), []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}, exitoScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
 			}
 
 			// Create the product and store in DB
-			err = database.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(exitoScraper, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}
@@ -61,13 +65,14 @@ func CheckProducts() {
 
 		if strings.Contains(URL.Host, "jumbo") {
 			// Make the Scraping to the page
-			scrapedProduct, err := scrapers.SendJumboCollyRequest(URL.String())
+			jumboScraper := &scraping.JumboScraper{}
+			err = scrapers.ScrapedPage(URL.String(), []string{constants.JUMBO_HALF_DOMAIN, constants.JUMBO_DOMAIN}, jumboScraper)
 			if err != nil {
 				log.Println("Error Getting the data from the craping ", err)
 			}
 
 			// Create the product and store in DB
-			err = database.CreateProduct(scrapedProduct, "")
+			err = database.CreateProduct(jumboScraper, "")
 			if err != nil {
 				log.Println("Error creating the Amazon product")
 			}

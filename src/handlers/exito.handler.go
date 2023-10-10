@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/database"
+	"webScraper/src/models/scraping"
 	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
@@ -23,7 +24,8 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make the Scraping to the page
-	scrapedProduct, err := scrapers.SendExitoCollyRequest(URL)
+	exitoScraper := &scraping.ExitoScraper{}
+	err = scrapers.ScrapedPage(URL, []string{constants.EXITO_HALF_DOMAIN, constants.EXITO_DOMAIN}, exitoScraper)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -31,7 +33,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the response
-	dataResponse, err := json.Marshal(scrapedProduct)
+	dataResponse, err := json.Marshal(exitoScraper)
 	if err != nil {
 		log.Println("Error Serializing the obtained data ", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -39,11 +41,11 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the product and store in DB
-	err = database.CreateProduct(scrapedProduct, userId)
+	err = database.CreateProduct(exitoScraper, userId)
 	if err != nil {
 		log.Println("Error creating the Exito product")
 		w.WriteHeader(http.StatusInternalServerError)
-		database.DeleteProduct(scrapedProduct)
+		database.DeleteProduct(exitoScraper)
 		return
 	}
 
@@ -53,7 +55,7 @@ func GetExitoData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error sending the response ", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		database.DeleteProduct(scrapedProduct)
+		database.DeleteProduct(exitoScraper)
 		return
 	}
 

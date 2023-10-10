@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"webScraper/src/constants"
 	"webScraper/src/database"
+	"webScraper/src/models/scraping"
 	"webScraper/src/services/scrapers"
 	"webScraper/src/utils"
 )
@@ -25,7 +26,8 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	// Make the Scraping to the page
 
 	// Create Collector
-	scrapedProduct, err := scrapers.SendAmazonCollyRequest(URL)
+	amazonScraper := &scraping.AmazonProduct{}
+	err = scrapers.ScrapedPage(URL, []string{constants.AMAZON_HALF_DOMAIN, constants.AMAZON_DOMAIN}, amazonScraper)
 	if err != nil {
 		log.Println("Error Getting the data from the craping ", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -33,18 +35,18 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the response
-	dataResponse, err := json.Marshal(scrapedProduct)
+	dataResponse, err := json.Marshal(amazonScraper)
 	if err != nil {
 		log.Println("Error Serializing the obtained data ", err)
 		return
 	}
 
 	// Create the product in the DB
-	err = database.CreateProduct(scrapedProduct, userId)
+	err = database.CreateProduct(amazonScraper, userId)
 	if err != nil {
 		log.Println("Error creating the Amazon product")
 		w.WriteHeader(http.StatusInternalServerError)
-		database.DeleteProduct(scrapedProduct)
+		database.DeleteProduct(amazonScraper)
 		return
 	}
 
@@ -54,7 +56,7 @@ func GetAmazonData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error sending the response")
 		w.WriteHeader(http.StatusInternalServerError)
-		database.DeleteProduct(scrapedProduct)
+		database.DeleteProduct(amazonScraper)
 		return
 	}
 
