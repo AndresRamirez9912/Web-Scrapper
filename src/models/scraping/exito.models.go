@@ -44,7 +44,7 @@ func (e ExitoCollector) OnError(r *colly.Response, err error) {
 	log.Println("Error making the scraping: ", err)
 }
 
-func (e ExitoCollector) OnHTML(h *colly.HTMLElement) {
+func (e *ExitoCollector) OnHTML(h *colly.HTMLElement) {
 	e.Id = h.ChildText("span.vtex-product-identifier-0-x-product-identifier__value")
 	exitoData := h.ChildText("script[type='application/ld+json']") // Send the response
 	err := json.Unmarshal([]byte(exitoData), &e)                   // Unmarshall and store on the object
